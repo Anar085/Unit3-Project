@@ -63,8 +63,7 @@ This combination of technologies—Python, Kivy/KivyMD, and SQLite—provides th
 
 ## ER diagram
 ![ER_diagram'](https://github.com/user-attachments/assets/cdc9052d-ff27-43ae-a7e9-fc00b042e05a)
-
-**Fig 4** ER Diagram of the classes
+**Fig 4** ER Diagram of the database
 
 ## Flow diagrams for algorithms
 
