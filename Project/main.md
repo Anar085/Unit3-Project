@@ -52,18 +52,13 @@ This combination of technologies—Python, Kivy/KivyMD, and SQLite—provides th
 # Criteria B: Design
 
 ## System Diagram
+![image](https://github.com/user-attachments/assets/0bf2d13b-c348-4cac-adbc-668b745cb426)
+
+**Fig 2** System diagram of proposed solution
 
 ## Flow diagrams for algorithms
 
-
-
-## Data storing method
-
-
-
-
-
-**Fig.5** Shows a section of the online API server http://192.168.4.137/readings where the data is being stored in real time every 1 minute
+## UML 
 
 ## Test Plan
                                                         |                 |            |
