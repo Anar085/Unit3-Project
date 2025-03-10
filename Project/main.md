@@ -10,11 +10,24 @@ My client, Ritsu Okazaki, operates a big-sized Turkish restaurant focused on del
 
 
 ## Proposed Solution
-
+I will be creating the POS program in Python. Python is an interpreted language that is supported by all the major operating systems and architectures, unlike compiled languages like Java. If Python is installed, the program will be compatible with basically any computer, which will make it ideal for Ritsu's restaurant if they ever need to change the hardware or migrate with different computer systems at any point in the future. The language is also open-source, which means there are no licensing costs, which can be allocated to other parts of the business [^1]. Because the program will be running on computers, as opposed to mobile phones, it is logical to utilize a language aimed at desktop applications, which eliminates mobile languages like Swift and Kotlin [^2].
+In the user interface, I will be using the Kivy framework. Kivy was designed with use for Python in mind, so it is among the most compatible application frameworks with my choice of language. Like its native language, Kivy is cross-platform, maintaining the advantage of easy portability between different devices [^3]. KivyMD will be incorporated as an extension, which includes Material Design features. This gives the application a stylish appearance fitting for the professional image of Ritsu's high-end Turkish restaurant, while also incorporating touch-based interface features suitable for restaurant workers to use the system in an efficient manner[^4].
+SQLite will be used for data storage. CSV and JSON files were also considered, but data relationship complexity between orders, menu items, tables, and user accounts requires a more solid database setup[^5]. SQLite offers great advantages in the sense that it is serverless, it requires no standalone server process. This is cost-effective for the restaurant in the sense that no server hardware and its upkeep will be paid for[^6]. SQLite, along with Python, is cross-platform, which ensures portability of the application[^7]. Compared to MySQL, which is also a very popular database program, SQLite is the most suited for this application in the sense that it is suited for local, single-app usage with many workers reading off of and writing to the same database file in a shared system—precisely the setup in Ritsu's restaurant business[^8]. SQLite's strong security features will also be beneficial in protecting confidential data such as encrypted user credentials and order history.
+This combination of technologies—Python, Kivy/KivyMD, and SQLite—provides the ideal answer to Ritsu's problems: secure role-based access, graphical depiction of the restaurant layout in a easily understood manner, secure data storage with permanent history, and user-friendly interface for easing the order management process eliminating ambiguity.
 
 ## Success Criterions
 
-[^1]: Industries, Adafruit. “DHT11 Basic Temperature-Humidity Sensor + Extras.” Adafruit Industries Blog RSS, https://www.adafruit.com/product/386. 
+[^1]: Merrill, Cache. "7 Important Reasons Why You Should Use Python." Zibtek, 1 September 2019, https://www.zibtek.com/blog/7-important-reasons-why-you-should-use-python
+[^2]:
+[^3]:
+[^4]:
+[^5]:
+[^6]:
+[^7]:
+[^8]:
+
+
+
 
 
 1. The pos app allows users to log in with valid credentials and directs them to appropriate interfaces based on their roles (Waiter or Administrator).  
