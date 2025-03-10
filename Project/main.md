@@ -67,6 +67,10 @@ This combination of technologies—Python, Kivy/KivyMD, and SQLite—provides th
 **Fig 4** ER Diagram of the database
 
 ## Flow diagrams for algorithms
+![Flow3](https://github.com/user-attachments/assets/cae5c8ff-f724-475c-bdf8-0d1b3158308f)
+
+**Fig 7** Flow
+
 
 ## Test Plan
 
