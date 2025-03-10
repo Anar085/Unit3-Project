@@ -1,6 +1,9 @@
-# Unit 3: Restaurant Point of Sale (POS) application
+# Unit 3: Point of Sale (POS) application for Turkish Restaurant
 
 ## Criteria A: Planning
+
+![Figure-1](https://github.com/user-attachments/assets/5dd5a3b2-ae3c-43ac-9833-f5a5fc9c4cb8)
+**Fig 1** Represents example of big-medium sized Turkish Restaurant
 
 ## Problem definition
 
