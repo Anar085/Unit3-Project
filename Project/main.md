@@ -54,17 +54,17 @@ This combination of technologies—Python, Kivy/KivyMD, and SQLite—provides th
 ## System Diagram
 ![image](https://github.com/user-attachments/assets/0bf2d13b-c348-4cac-adbc-668b745cb426)
 
-**Fig 2** System diagram of proposed solution
+**Fig 2** *System diagram of proposed solution*
 
 
 ## UML diagram
 ![UML_diagram](https://github.com/user-attachments/assets/a8a50182-0e1b-4cfe-a2c1-1c98522ee23e)
-**Fig 3** UML Diagram of the classes
+**Fig 3** *UML Diagram of the classes*
 
 ## ER diagram
 ![ER_diagram'](https://github.com/user-attachments/assets/cdc9052d-ff27-43ae-a7e9-fc00b042e05a)
 
-**Fig 4** ER Diagram of the database
+**Fig 4** *ER Diagram of the database*
 
 ## Flow diagrams for algorithms
 ![flow1](https://github.com/user-attachments/assets/6299626b-271f-4c92-b38a-57d05c7865ab)
