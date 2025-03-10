@@ -25,33 +25,23 @@ Limited Control for Administrators: Administrators lack the ability to efficient
 [^1]: Industries, Adafruit. “DHT11 Basic Temperature-Humidity Sensor + Extras.” Adafruit Industries Blog RSS, https://www.adafruit.com/product/386. 
 
 
-1. **User Authentication and Role-Based Access:**  
-   The system allows users to log in with valid credentials and directs them to appropriate interfaces based on their roles (Waiter/Administrator).  
+1. The pos app allows users to log in with valid credentials and directs them to appropriate interfaces based on their roles (Waiter or Administrator).  
    **[ISSUE TACKLED]**: `Unauthorized access is prevented, and users only see functionality based on their role.`
 
-2. **Order Management (Waiter-Specific)**:
-   Waiters can select a table, create new orders, and add menu items with specific quantities.
-   The system calculates the total cost, including service charges and taxes, and allows waiters to print bills.
-   Waiters can view ongoing orders for their assigned tables and update them as needed.
-**[ISSUE TACKLED]**: Waiters can efficiently manage orders and ensure accurate billing for customers.
+2. **Waiter Specific**: Waiters can select a table, create new orders with specific quantities and the app calculates the total cost, including service charges and taxes, and allows waiters to print bills. Waiters can add to their ongoing orders anytime they come back to their table screen.
+**[ISSUE TACKLED]**: `Confusion caused by taking orders is gone as all operations for waiters are in one screen for certain table`
 
-3. **Order Management and Table Status Updates (Admin-Specific)**:
-   Admins can view all ongoing orders, cancel or finish orders, and update table statuses (e.g., from "Occupied" to "Available").
-   Admins can access detailed order information, including items, quantities, and total costs.
-   Admins can manage tables and ensure proper allocation based on real-time status updates.
-**[ISSUE TACKLED]**: Admins have full control over order and table management, ensuring smooth restaurant operations.
+3. **Admin-Specific**: Admins can view all ongoing orders through tables, cancel or finish orders, which automatically update table statuses. They can access detailed order information: items, quantities, and total costs.
+**[ISSUE TACKLED]**:  `Dismanagement is prevented, now Admins have full control over the table`
 
-4. **Data Security and Persistence:**  
-   User passwords are encrypted using `secure_password` functions, and all data (orders, users, tables) is stored permanently in an SQLite database.  
-   **[ISSUE TACKLED]**: `Sensitive data (e.g., passwords) is securely stored, and order history persists across app restarts.`
+4. User passwords are encrypted as hashes, and all data (orders, users, tables) is stored permanently in an SQLite database.  
+   **[ISSUE TACKLED]**: `Sensitive data is securely stored, and order history can be used when app restarts.`
 
-5. **Accurate Financial Calculations:**  
-   The system calculates totals, service charges (3%), and taxes (2%) correctly for orders and displays them in bills.  
-   **[ISSUE TACKLED]**: `Bills reflect accurate pricing, ensuring transparency and correctness in financial transactions.`
+5. The system calculates totals, service charges (3%), and taxes (2%) correctly for orders and displays them in bills.  
+   **[ISSUE TACKLED]**: `Transparency and correctness issues in financial transactions are now minimized.`
 
-6. **Usable UI with Navigation Flow:**  
-   The KivyMD interface allows seamless navigation between screens (e.g., Login ➔ Waiter/Admin Dashboard ➔ Table Management).  
-   **[ISSUE TACKLED]**: `Users can efficiently interact with the system, reducing errors and improving task completion speed.`
+6. The User interface provides "touchable" map of restaurant and there is a clear navigation between screens (for ex, Login to Waiter/Admin Inside/Terrace to Table Screens).  
+   **[ISSUE TACKLED]**: `Confusion caused by the largeness of restaurant for both waiters and admins is now minimized`
 
 
 
