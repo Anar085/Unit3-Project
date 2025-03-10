@@ -35,7 +35,7 @@ Limited Control for Administrators: Administrators lack the ability to efficient
 **[ISSUE TACKLED]**:  `Dismanagement is prevented, now Admins have full control over the table`
 
 4. User passwords are encrypted as hashes, and all data (orders, users, tables) is stored permanently in an SQLite database.  
-   **[ISSUE TACKLED]**: `Sensitive data is securely stored, and order history can be used when app restarts.`
+   **[ISSUE TACKLED]**: `Explotiation of sensitive data is prevented as they are securely stored, and order history can be used when app restarts.`
 
 5. The User interface provides "touchable" map of restaurant and there is a clear navigation between screens (for ex, Login to Waiter/Admin Inside/Terrace to Table Screens).  
    **[ISSUE TACKLED]**: `Confusion caused by the largeness of restaurant for both waiters and admins is now minimized`
