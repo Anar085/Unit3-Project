@@ -61,6 +61,8 @@ This combination of technologies—Python, Kivy/KivyMD, and SQLite—provides th
 ## UML diagram
 ![UML_diagram](https://github.com/user-attachments/assets/a8a50182-0e1b-4cfe-a2c1-1c98522ee23e)
 
+## ER diagram
+
 **Fig 2** UML Diagram of the classes
 ## Test Plan
 
