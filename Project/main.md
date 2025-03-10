@@ -25,23 +25,31 @@ Limited Control for Administrators: Administrators lack the ability to efficient
 [^1]: Industries, Adafruit. “DHT11 Basic Temperature-Humidity Sensor + Extras.” Adafruit Industries Blog RSS, https://www.adafruit.com/product/386. 
 
 
-1. **User Authentication and Role-Based Access Control:**  
+1. **User Authentication and Role-Based Access:**  
    The system allows users to log in with valid credentials and directs them to appropriate interfaces based on their roles (Waiter/Administrator).  
-   **[ISSUE TACKLED]**: `Unauthorized access is prevented, and users only see functionality relevant to their role.`
+   **[ISSUE TACKLED]**: `Unauthorized access is prevented, and users only see functionality based on their role.`
 
-2. **Order Management and Table Status Updates:**  
-   Waiters can create orders for tables, add items with quantity, and print bills, while admins can cancel/finish orders and update table statuses.  
-   **[ISSUE TACKLED]**: `Orders are accurately tracked, and table statuses (Available/Occupied) reflect real-time usage.`
+2. **Order Management (Waiter-Specific)**:
+   Waiters can select a table, create new orders, and add menu items with specific quantities.
+   The system calculates the total cost, including service charges and taxes, and allows waiters to print bills.
+   Waiters can view ongoing orders for their assigned tables and update them as needed.
+**[ISSUE TACKLED]**: Waiters can efficiently manage orders and ensure accurate billing for customers.
 
-3. **Data Security and Persistence:**  
+3. **Order Management and Table Status Updates (Admin-Specific)**:
+   Admins can view all ongoing orders, cancel or finish orders, and update table statuses (e.g., from "Occupied" to "Available").
+   Admins can access detailed order information, including items, quantities, and total costs.
+   Admins can manage tables and ensure proper allocation based on real-time status updates.
+**[ISSUE TACKLED]**: Admins have full control over order and table management, ensuring smooth restaurant operations.
+
+4. **Data Security and Persistence:**  
    User passwords are encrypted using `secure_password` functions, and all data (orders, users, tables) is stored permanently in an SQLite database.  
    **[ISSUE TACKLED]**: `Sensitive data (e.g., passwords) is securely stored, and order history persists across app restarts.`
 
-4. **Accurate Financial Calculations:**  
+5. **Accurate Financial Calculations:**  
    The system calculates totals, service charges (3%), and taxes (2%) correctly for orders and displays them in bills.  
    **[ISSUE TACKLED]**: `Bills reflect accurate pricing, ensuring transparency and correctness in financial transactions.`
 
-5. **Usable UI with Navigation Flow:**  
+6. **Usable UI with Navigation Flow:**  
    The KivyMD interface allows seamless navigation between screens (e.g., Login ➔ Waiter/Admin Dashboard ➔ Table Management).  
    **[ISSUE TACKLED]**: `Users can efficiently interact with the system, reducing errors and improving task completion speed.`
 
