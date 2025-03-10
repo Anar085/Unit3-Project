@@ -67,13 +67,18 @@ This combination of technologies—Python, Kivy/KivyMD, and SQLite—provides th
 **Fig 4** ER Diagram of the database
 
 ## Flow diagrams for algorithms
+![flow1](https://github.com/user-attachments/assets/6299626b-271f-4c92-b38a-57d05c7865ab)
+
+**Fig 5** This flowchart represents the login process from **LoginScreen** class. (Easy)
 ![flow2](https://github.com/user-attachments/assets/ffff4b0e-df87-4bc2-8472-fae75a4214d8)
 
-**Fig 7** Flow
+**Fig 6** This flowchart represents the batch update process from the **Table_Waiter** class, where multiple items are updated in the database. (Medium)
 
 ![flow3r](https://github.com/user-attachments/assets/6bb26b1d-c313-41d8-8e50-67d5e415358d)
 
-**Fig 7** Flow
+**Fig 7** This flowchart represents the entire lifecycle of an order, from creation to completion or cancellation. (Hard)
+
+
 
 
 ## Test Plan
