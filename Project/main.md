@@ -3,7 +3,7 @@
 ## Criteria A: Planning
 
 ![Figure-1](https://github.com/user-attachments/assets/5dd5a3b2-ae3c-43ac-9833-f5a5fc9c4cb8)
-**Fig 1** Represents example of big-medium sized Turkish Restaurant
+**Fig 1** *Represents example of big-medium sized Turkish Restaurant*
 
 ## Problem definition
 My client, Ritsu Okazaki, operates a big-sized Turkish restaurant focused on delivering high-quality dining experience. However, the restaurant currently faces several challenges related to order management and payments. Waiters in his resturant manually take orders and deliver them to the kitchen, which sometimes causes mistakes and miscommunication. And additionally, there are more problems caused by manual order management such as losing bills, miscommuncation over the orders need to be canceled, and etc. That is why, he thinks they need digital system for their order management, but he has some concerns. Firstly, he is concerned about unauthorized access for the relevan roles in this digital platform which can lead to misusage. Secondly, they have a really big restaurant consisting two different halls (inside and terrace), which makes it hard for waiters and admins if they only see the number of the tables in the platform. Thirdly, he is concerned about the data storage in the system as he does want sensitive data to be easily accessed, but at the same time he wants to keep the track of orders, users' account and etc. Lastly, he is concerned about dismanagement and confusion caused by taking orders and he wishes this system to be user-friendly.
