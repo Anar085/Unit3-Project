@@ -20,7 +20,7 @@ Limited Control for Administrators: Administrators lack the ability to efficient
 ## Proposed Solution
 
 
-## Success Criteria
+## Success Criterions
 
 [^1]: Industries, Adafruit. “DHT11 Basic Temperature-Humidity Sensor + Extras.” Adafruit Industries Blog RSS, https://www.adafruit.com/product/386. 
 
