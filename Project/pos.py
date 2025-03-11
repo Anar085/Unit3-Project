@@ -849,7 +849,6 @@ class pos(MDApp):
                         status TEXT DEFAULT 'Available'
                     )
                 ''')
-            # Populate tables 1-37
             for i in range(1, 38):
                 if not db.fetch_one(f"SELECT 1 FROM tables WHERE id={i}"):
                     db.execute(f"INSERT INTO tables (id) VALUES ({i})")
