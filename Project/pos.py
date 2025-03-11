@@ -309,3 +309,46 @@ class OrderItemWidget(OneLineIconListItem):
         super().__init__(**kwargs)
         self.text=f"{item.name} x{item.quantity} - {item.price}¥"
         self.item=item
+
+#restaurant map main screens
+class Waiter_Inside(MDScreen):
+    selected_table=StringProperty("")
+    def select_table(self,table_number):
+        self.selected_table=str(table_number)
+        self.manager.selected_table=str(table_number)
+        self.manager.current="Table_Waiter"
+
+class Waiter_Terrace(MDScreen):
+    selected_table=StringProperty("")
+    def select_table(self,table_number):
+        self.selected_table=str(table_number)
+        self.manager.selected_table=str(table_number)
+        self.manager.current="Table_Waiter"
+
+class Admin_Inside(MDScreen):
+    selected_table_admin=StringProperty("")
+    def select_table_admin(self,table_number):
+        self.selected_table_admin=str(table_number)
+        self.manager.selected_table_admin=str(table_number)
+        db=Database_Manager('pos.db')
+        status=db.search_one(f"SELECT status FROM tables WHERE id={table_number}")[0]
+        print(status)
+        if status=="Available":
+            self.manager.current="Table_Admin_Available"
+        elif status=="Occupied":
+            self.manager.current="Table_Admin_Occupied"
+        db.close()
+
+class Admin_Terrace(MDScreen):
+    selected_table_admin=StringProperty("")
+    def select_table_admin(self,table_number):
+        self.selected_table_admin=str(table_number)
+        self.manager.selected_table_admin=str(table_number)
+        db=Database_Manager('pos.db')
+        status=db.search_one(f"SELECT status FROM tables WHERE id={table_number}")[0]
+        print(status)
+        if status=="Available":
+            self.manager.current="Table_Admin_Available"
+        elif status=="Occupied":
+            self.manager.current="Table_Admin_Occupied"
+        db.close()
