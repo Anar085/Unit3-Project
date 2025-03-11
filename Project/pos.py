@@ -126,3 +126,69 @@ class RegisterScreen(MDScreen):
         self.ids.username_reg.error=False
         self.ids.password_reg.error=False
         self.ids.password_check_reg.error=False
+
+class CustomRectButton(ButtonBehavior,Widget):
+    text=StringProperty("Button")
+    fill_color=ListProperty([0.8,0.8,0.8,1])
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+        with self.canvas.before:
+            self.bg_color=Color(*self.fill_color)
+            self.bg_rect=Rectangle()
+            self.top_tab=Rectangle()
+            self.bottom_tab=Rectangle()
+            self.left_tab=Rectangle()
+            self.right_tab=Rectangle()
+            self.line_color=Color(0,0,0,1)
+            self.line_main=Line()
+            self.line_top=Line()
+            self.line_bottom=Line()
+            self.line_left=Line()
+            self.line_right=Line()
+        self.label=Label(text=self.text,font_size=30,color=(0,0,0,1),size_hint=(None,None))
+        self.add_widget(self.label)
+        self.bind(pos=self.update_graphics,size=self.update_graphics,text=self.update_text)
+    def update_text(self,*args):
+        self.label.text=self.text
+        self.label.texture_update()
+        self.label.size=self.label.texture_size
+    def update_graphics(self, *args):
+        #dimensions for the button body
+        main_rect_width=100
+        main_rect_height=60
+        main_x=self.x+(self.width-main_rect_width)/2
+        main_y=self.y+(self.height-main_rect_height)/2
+        #dimensions for four small rectangles representin chairs
+        tab_w,tab_h=20,20
+        top_x=main_x+(main_rect_width-tab_w)/2
+        top_y=main_y+main_rect_height
+        bottom_x=top_x
+        bottom_y=main_y-tab_h
+        left_x=main_x-tab_w
+        left_y=main_y+(main_rect_height-tab_h)/2
+        right_x=main_x+main_rect_width
+        right_y=left_y
+        #background shapes
+        self.bg_color.rgba=self.fill_color
+        self.bg_rect.pos=(main_x,main_y)
+        self.bg_rect.size=(main_rect_width,main_rect_height)
+        self.top_tab.pos=(top_x,top_y)
+        self.top_tab.size=(tab_w,tab_h)
+        self.bottom_tab.pos=(bottom_x,bottom_y)
+        self.bottom_tab.size=(tab_w,tab_h)
+        self.left_tab.pos=(left_x,left_y)
+        self.left_tab.size=(tab_w,tab_h)
+        self.right_tab.pos=(right_x,right_y)
+        self.right_tab.size=(tab_w,tab_h)
+        #outlines
+        self.line_main.rectangle=(main_x,main_y,main_rect_width,main_rect_height)
+        self.line_top.rectangle=(top_x,top_y,tab_w,tab_h)
+        self.line_bottom.rectangle=(bottom_x,bottom_y,tab_w,tab_h)
+        self.line_left.rectangle=(left_x,left_y,tab_w,tab_h)
+        self.line_right.rectangle=(right_x,right_y,tab_w,tab_h)
+        #putting label to the center
+        self.label.texture_update()
+        self.label.size=self.label.texture_size
+        self.label.center=(self.x+self.width/2,self.y+self.height/2)
+    def on_press(self):
+        print(f"Rectangular table button's text:{self.text}")
