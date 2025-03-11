@@ -571,6 +571,131 @@ class Table_Waiter(MDScreen):
             buttons=[MDFlatButton(text="CLOSE",on_release=lambda x: dialog.dismiss())],
         )
         dialog.open()
+#admin screen for occupied tables 
+class Table_Admin_Occupied(MDScreen):
+    selected_table_admin=StringProperty("")
+    current_status=StringProperty("Occupied")
+    order_items=ListProperty([])
+    order_id=NumericProperty(0)
+    def connect_db(self):
+        return sqlite3.connect('pos.db')
+
+    def on_pre_enter(self):
+        self.selected_table_admin=self.manager.selected_table_admin
+        self.order_items=[]
+        self.order_id=0
+
+    def on_enter(self):
+        self.load_ongoing_order()
+        self.update_ordered_items_list()
+        self.update_price_info()
+
+    def load_ongoing_order(self):        
+        conn=self.connect_db()
+        cursor=conn.cursor()
+        query1='''SELECT id, items FROM orders WHERE table_id = ? AND status = 'Ongoing'ORDER BY timestamp DESC LIMIT 1'''
+        cursor.execute(query1, (self.selected_table_admin,))
+        result = cursor.fetchone()
+        if result:
+            self.order_id=result[0]
+            items_str=result[1]
+            query2='''SELECT id, food_name, price, quantity FROM order_items WHERE order_id = ?'''
+            cursor.execute(query2, (self.order_id,))
+            items_result=cursor.fetchall()
+            if items_result:
+                for item in items_result:
+                    item_id,name,price,quantity=item
+                    self.order_items.append(OrderedItem2(name,price,quantity,item_id))
+            elif items_str:
+                items=items_str.split("; ")
+                for item_str in items:
+                    if " x" in item_str and " - " in item_str:
+                        name=item_str.split(" x")[0]
+                        quantity=int(item_str.split(" x")[1].split(" - ")[0])
+                        price=int(item_str.split(" - ")[1].split("¥")[0])
+                        self.order_items.append(OrderedItem2(name,price,quantity))
+        conn.close()
+
+    def update_ordered_items_list(self):
+        ordered_list=self.ids.ordered_items_list
+        ordered_list.clear_widgets()
+        for item in self.order_items:
+            list_item = OrderItemWidget(item)
+            ordered_list.add_widget(list_item)
+            
+    def calculate_total(self):
+        subtotal=sum(item.get_total() for item in self.order_items)
+        service_charge=round(subtotal*0.03)
+        tax=round(subtotal * 0.02)
+        total=subtotal+service_charge+tax
+        return {
+            'subtotal': subtotal,
+            'service_charge': service_charge,
+            'tax': tax,
+            'total': total
+        }
+
+    def update_price_info(self):
+        price_label=self.ids.price_label
+        price_data=self.calculate_total()
+        price_label.text=(
+            f"Food: {price_data['subtotal']}¥\n"
+            f"Service Charge (3%): {price_data['service_charge']}¥\n"
+            f"Tax (2%): {price_data['tax']}¥\n"
+            f"Total: {price_data['total']}¥"
+        )
+
+    def print_bill(self):
+        if not self.order_items:
+            return
+        bill_text = self.get_bill_text()
+        self.show_bill_dialog(bill_text)
+
+    def get_bill_text(self):
+        subtotal=sum(item.total for item in self.order_items)
+        service_charge=round(subtotal*0.03)
+        tax=round(subtotal*0.02)
+        total=subtotal+service_charge + tax
+        bill=f"=== TABLE {self.selected_table_admin} BILL ===\n"
+        bill+=f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n"
+        bill+="ORDERED ITEMS:\n"
+        for item in self.order_items:
+            bill += f"{item.name} x{item.quantity} - {item.total}¥\n"
+        bill+=f"\nSubtotal: {subtotal}¥\n"
+        bill+=f"Service Charge (3%): {service_charge}¥\n"
+        bill+=f"Tax (2%): {tax}¥\n"
+        bill+=f"TOTAL: {total}¥\n"
+        return bill
+
+    def show_bill_dialog(self, bill_text):
+        dialog=MDDialog(
+            title="Bill Printed",
+            text=bill_text,
+            buttons=[MDFlatButton(text="CLOSE", on_release=lambda x: dialog.dismiss())],
+        )
+        dialog.open()
+    def cancel_order(self, instance=None):
+        db=Database_Manager('pos.db')
+        db.run_save(f"DELETE FROM order_items WHERE order_id={self.order_id}")
+        db.run_save(f"DELETE FROM orders WHERE id={self.order_id}")
+        db.run_save(f"UPDATE tables SET status='Available' WHERE id='{self.selected_table_admin}'")
+        app=MDApp.get_running_app()
+        app.show_toast("Order canceled successfully")
+        db.close()
+        self.manager.current = "Admin_Inside"
+    def finish_order(self, instance=None):
+        db = Database_Manager('pos.db')
+        db.run_save(f"UPDATE orders SET status='Finished' WHERE id={self.order_id}")
+        db.run_save(f"UPDATE tables SET status='Available' WHERE id='{self.selected_table_admin}'")
+        app=MDApp.get_running_app()
+        app.show_toast("Order finished successfully")
+        db.close()
+        self.manager.current="Admin_Inside"
+    def change_status(self,new_status):
+        db=Database_Manager('pos.db')
+        db.run_save(f"UPDATE tables SET status='{new_status}' WHERE id='{self.selected_table_admin}'")  
+        db.close()
+        self.manager.current="Admin_Inside"
 
 #admin available screen
 class Table_Admin_Available(MDScreen):
