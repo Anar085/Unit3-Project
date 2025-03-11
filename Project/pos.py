@@ -761,7 +761,7 @@ class Ongoing_Orders(MDScreen):
         self.update()
 
     def update(self):
-        data = pos.db.search_all("""SELECT t.id, o.waiter, o.timestamp, o.id FROM orders o JOIN tables t ON o.table_id = t.id WHERE o.status="Ongoing"""")
+        data = pos.db.search_all("""SELECT t.id, o.waiter, o.timestamp, o.id FROM orders o JOIN tables t ON o.table_id = t.id WHERE o.status="Ongoing" """)
         self.data_table.update_row_data(None,data)
     def row_pressed(self, table, cell):
         print(f"Cell pressed:{cell.text}")
