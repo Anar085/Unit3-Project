@@ -132,15 +132,88 @@
 
 ## List of techniques used
 
-1. *SQL Database usage and Password hashing* - **#SC4**
-2. *OOP Paradigm* - **#SC1, #SC2, #SC3, #SC4, #SC5**
-3. *Use of Dropdown Menu* - **#SC1**
-4. *Use of Data Table* - **#SC3**
-5. *Use of Properties instead of regular variables* - **#SC2, #SC3, #SC5**
-6. *Use of OneLineListItem* - **#SC2**
-7. *Use of MD Dialog* - **#SC2**
-8. *Threading method, batch update, and fixing pragma modes* - **#SC2**
-9. *Customization of Buttons* - **#SC5**
+1. *SQL Database usage and Password hashing* - **#SC4** 150 words
+2. *OOP Paradigm* - **#SC1, #SC2, #SC3, #SC4, #SC5** 50 words
+3. *Use of Dropdown Menu* - **#SC1** 100 words
+4. *Use of Data Table* - **#SC3** 100 words
+5. *Use of Properties instead of regular variables* - **#SC2, #SC3, #SC5** 50 words
+6. *Use of OneLineListItem* - **#SC2** 50 words
+7. *Use of MD Dialog* - **#SC2** 150 words
+8. *Threading method, batch update, and fixing pragma modes* - **#SC2** 150 words
+9. *Customization of Buttons* - **#SC5** 200 words
+
+### 1. SQL Database usage and Password hashing - #SC4:
+To address the first part of **#SC4**, I used SQLite because it is lightweight, file-based, and it does not require a separate server, and it is ideal data storing method for a POS system. Then I started by designing the database schema to meet the project’s requirements. The schema includes four main tables : `users`, `orders`, `order_items`, and `tables`. I wrote a Python function to initialize the database and create the tables if they do not already exist. First, `users` table stores user credentials and roles:
+```.sql
+CREATE TABLE users (  
+    id INTEGER PRIMARY KEY,  
+    username TEXT UNIQUE,  
+    password TEXT,  
+    role TEXT DEFAULT 'waiter'  
+); 
+```
+Here the username is unique to prevent duplicate accounts, and the role column provides role-based access **#SC1**. Second, `orders` table tracks orders placed by users:
+```.sql
+CREATE TABLE orders (  
+    id INTEGER PRIMARY KEY AUTOINCREMENT,  
+    table_id INTEGER,  
+    waiter TEXT,  
+    items TEXT,  
+    total REAL,  
+    status TEXT,  
+    timestamp DATETIME  
+);  
+```
+Here the `table_id` links orders to specific tables, and the status column tracks whether an order is ongoing or finished. Third, `order_items` table stores individual items in each order:
+```.sql
+CREATE TABLE order_items (  
+    id INTEGER PRIMARY KEY AUTOINCREMENT,  
+    order_id INTEGER,  
+    food_name TEXT,  
+    price INTEGER,  
+    quantity INTEGER,  
+    FOREIGN KEY (order_id) REFERENCES orders(id)  
+);    
+```
+Here the `order_id` foreign key ensures that items are linked to valid orders and it creates relational integrity with the table `orders`. Fourth, `tables` table manages table statuses (for ex: available, occupied):
+```.sql
+CREATE TABLE tables (  
+    id INTEGER PRIMARY KEY,  
+    status TEXT DEFAULT 'Available'  
+);  
+```
+Here the status column helps track which tables are in use, and it so important for **#SC3** (order tracking for admins).Initially, I forgot to enable foreign key support, which made `order_id` values  invalid in `order_items` table. I fixed this by adding `PRAGMA foreign_keys=ON` to the connection setup.
+For security, I implemented password hashing by  `the secure_password` module, which provides two functions: `encrypt_password` and `check_hash2`. During registration, the user’s password is hashed using SHA-256 with a unique hash and it is stored in the `users` table as a hash. During login, the input password is compared to the stored hash using check_hash2, which extracts the hash from `users` table, re-hashes it, and compares the result. I chose SHA-256 over weaker algorithms like MD5 because it is collision-resistant and recommended by OWASP[^9] for password storage. Initially, I stored passwords as how they are during testing, but after I realized the security risk, then I switched to hashing and updated the database schema. Example of hashing during registration: 
+```.py
+password_hash = encrypt_password(password1)   
+db.run_save(f"INSERT INTO users VALUES ('{username}', '{password_hash}')")  
+```
+Here is another example of hash verification during login:
+```.py
+user_info = db.search_one(f"SELECT * FROM users WHERE username='{username}'")  
+if user_info and check_hash2(password, user_info[2]): 
+    print("Login successful!")  
+```
+
+### 2.  - #SC4: OOP Paradigm - #SC1, #SC2, #SC3, #SC4, #SC5 50 words
+OOP paradigm is one of the focuses of this project and `OrderedItem` class was the best example of how I applied OOP priniciples to this project. The `OrderedItem ` class *encapsulates* all details of item , including everything. This is how it was defined:
+```.py
+class OrderedItem:
+    def __init__(self,name,price,quantity,item_id=None):
+        self.name=name
+        if isinstance(price,str) and "¥" in price:
+            self.price=int(price.split("¥")[0].strip())
+        else:
+            self.price=int(price)
+        self.quantity=quantity
+        self.total=self.price*self.quantity
+        self.item_id=item_id
+```
+Here we can see that all details of item is initialized. This *encapsulation* makes it reusable and inheretable throughout the project as my project is mainly about item order management. Through the use of this class in `Table_Waiter` screen, I made sure that this development is optimized and repetitions are minimized. This class also includes the `_str_` method for providing item's details in a string format for future usage:
+```.py
+    def __str__(self):
+        return f"{self.name} x{self.quantity} - {self.price}¥ = {self.total}¥"
+```
 
 
 
