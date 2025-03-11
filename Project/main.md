@@ -114,7 +114,12 @@
 ## Data storing method
 
 
+
 # Criteria C: Development
+
+![image](https://github.com/user-attachments/assets/c9c5a570-bb1c-4e8b-b7a0-45902964fd75)
+
+**Fig 8** *This extract is an example how the data is stored - SQL Database*
 
 
 ## List of techniques used
