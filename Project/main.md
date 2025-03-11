@@ -110,7 +110,12 @@
 | 19      | Document the list of techniques used for coding part and explain my code by picking the special parts  | To make documentation of the coding part more understandable                                                   | 2 hours       | March 8                | C         |
 | 20      | Give information about my data storing method- SQL Databases                                           | To give description of the data format used                                                                    | 1 hour        | March 9                | B         |
 | 21      | Take 4 min video demonstrating the application and its functionalities                                 | To achieve clear and concise explanation of the project, its results, and its implementation                   | 2 hours       | March 10               | D         |
+
+## Data storing method
+
+
 # Criteria C: Development
+
 
 ## List of techniques used
 
