@@ -71,10 +71,10 @@
 ## Flow diagrams for algorithms
 ![flow1](https://github.com/user-attachments/assets/6299626b-271f-4c92-b38a-57d05c7865ab)
 
-**Fig 5** *This flowchart represents the login process from `**LoginScreen**` class. (Easy)*
+**Fig 5** *This flowchart represents the login process from **`LoginScreen`** class. (Easy)*
 ![flow2](https://github.com/user-attachments/assets/ffff4b0e-df87-4bc2-8472-fae75a4214d8)
 
-**Fig 6** *This flowchart represents the batch update process from the `**Table_Waiter**` class, where multiple items are updated in the database. (Medium)*
+**Fig 6** *This flowchart represents the batch update process from the **`Table_Waiter`** class, where multiple items are updated in the database. (Medium)*
 
 ![flow3r](https://github.com/user-attachments/assets/6bb26b1d-c313-41d8-8e50-67d5e415358d)
 
@@ -119,7 +119,7 @@
 
 ![image](https://github.com/user-attachments/assets/c9c5a570-bb1c-4e8b-b7a0-45902964fd75)
 
-**Fig 8** *This extract is an example how the data is stored - SQL Database*
+**Fig 8** *This extract is an example how the data is stored -**SQL Database***
 
 
 ## List of techniques used
