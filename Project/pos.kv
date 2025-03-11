@@ -1,0 +1,1641 @@
+#pos.kv
+ScreenManager:
+    id: scr_manager
+
+    LoginScreen:
+        name: "LoginScreen"
+    RegisterScreen:
+        name: "RegisterScreen"
+
+    Waiter_Inside:
+        name: "Waiter_Inside"
+    Waiter_Terrace:
+        name: "Waiter_Terrace"
+
+    Admin_Inside:
+        name: "Admin_Inside"
+    Admin_Terrace:
+        name: "Admin_Terrace"
+
+
+    Table_Waiter:
+        name: "Table_Waiter"
+    Table_Admin_Available:
+        name: "Table_Admin_Available"
+    Table_Admin_Occupied:
+        name: "Table_Admin_Occupied"
+    Ongoing_Orders:
+        name: "Ongoing_Orders"
+
+
+<LoginScreen>:
+    MDCard:
+        size_hint: .5, .7
+        pos_hint: {"center_x": .5, "center_y": .5}
+        orientation: "vertical"
+        padding: 25
+        spacing: 15
+
+        MDLabel:
+            text: "POS Login"
+            halign: "center"
+            font_style: "H4"
+
+        MDTextField:
+            id: username_login
+            hint_text: "Username"
+            icon_left: "account"
+
+        MDTextField:
+            id: password_login
+            hint_text: "Password"
+            icon_left: "key"
+            password: True
+
+        MDLabel:
+            id: login_error
+            text: ""
+            color: 1, 0, 0, 1
+
+        MDRaisedButton:
+            text: "Login"
+            on_release: root.try_login()
+            pos_hint: {"center_x": 0.5}
+
+        MDRectangleFlatButton:
+            text: "Register"
+            on_release: root.manager.current = "RegisterScreen"
+            pos_hint: {"center_x": 0.5}
+
+<RegisterScreen>:
+    MDCard:
+        size_hint: .5, .85
+        pos_hint: {"center_x": .5, "center_y": .5}
+        orientation: "vertical"
+        padding: 25
+        spacing: 15
+
+        MDLabel:
+            text: "Register"
+            halign: "center"
+            font_style: "H4"
+
+        MDTextField:
+            id: username_reg
+            hint_text: "Username"
+            icon_left: "account"
+
+        MDTextField:
+            id: password_reg
+            hint_text: "Password"
+            icon_left: "key"
+            password: True
+
+        MDTextField:
+            id: password_check_reg
+            hint_text: "Confirm your password"
+            icon_left: "key"
+            password: True
+
+        MDTextField:
+            id: res_password
+            hint_text: "Enter restaurant password"
+            icon_left: "key"
+            password: True
+
+        MDDropDownItem:
+            id: dropdown_reg
+            text: 'Select Role'
+            on_release: root.create_role_menu(self)
+        MDLabel:
+            id: reg_error
+            text: ""
+            color: 1, 0, 0, 1
+
+        MDRaisedButton:
+            text: "Create Account"
+            on_release: root.try_register()
+            pos_hint: {"center_x": 0.5}
+
+        MDRectangleFlatButton:
+            text: "Back to Login"
+            on_release: root.manager.current = "LoginScreen"
+            pos_hint: {"center_x": 0.5}
+
+
+<Table_Waiter>:
+    name: "Table_Waiter"
+    BoxLayout:
+        orientation: 'vertical'
+        padding: [dp(20), dp(20), dp(20), dp(20)]
+        spacing: dp(10)
+
+        # Top header
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: dp(56)
+            MDCard:
+                size_hint_x: 0.9
+                md_bg_color: 0.9, 0.9, 0.9, 1
+                MDLabel:
+                    text: f"Table {root.selected_table}"
+                    halign: "center"
+                    theme_text_color: "Primary"
+            MDIconButton:
+                size_hint_x: 0.1
+                icon: "logout"
+                md_bg_color: 0.9, 0.9, 0.9, 1
+                pos_hint: {"right": 1, "center_y": 0.5}
+                on_release: root.manager.current = "Waiter_Inside"
+
+        GridLayout:
+            cols: 2
+            rows: 2
+            spacing: dp(1)
+
+            # Top Left - Orders (0.35, 0.65)
+            BoxLayout:
+                size_hint_x: 0.35
+                size_hint_y: 0.65
+                orientation: 'vertical'
+                canvas.before:
+                    Color:
+                        rgba: 0, 0, 0, 1
+                    Line:
+                        rectangle: self.x, self.y, self.width, self.height
+                        width: 2
+
+                MDLabel:
+                    text: "Ordered Items"
+                    size_hint_y: None
+                    height: dp(40)
+                    halign: "center"
+                    theme_text_color: "Primary"
+                    md_bg_color: 0.9, 0.9, 0.9, 1
+
+                ScrollView:
+                    do_scroll_x: False
+                    do_scroll_y: True
+
+                    MDList:
+                        id: ordered_items_list
+
+
+            # Top Right - Menu (0.65, 0.65)
+            BoxLayout:
+                size_hint_x: 0.65
+                size_hint_y: 0.65
+                orientation: 'vertical'
+                canvas.before:
+                    Color:
+                        rgba: 0, 0, 0, 1
+                    Line:
+                        rectangle: self.x, self.y, self.width, self.height
+                        width: 2
+
+                MDLabel:
+                    text: "Menu"
+                    size_hint_y: None
+                    height: dp(40)
+                    halign: "center"
+                    theme_text_color: "Primary"
+                    md_bg_color: 0.9, 0.9, 0.9, 1
+
+                # Scrollable Menu Grid
+                ScrollView:
+                    do_scroll_x: False
+                    do_scroll_y: True
+
+                    GridLayout:
+                        id: menu_grid
+                        cols: 3
+                        spacing: dp(10)
+                        padding: dp(10)
+                        size_hint_y: None
+                        height: self.minimum_height
+
+                        MDLabel:
+                            text: "Main"
+                            size_hint_y: None
+                            height: dp(40)
+                            halign: "center"
+                            theme_text_color: "Primary"
+                            md_bg_color: 0.8, 0.8, 0.8, 1
+
+
+
+                        MDRectangleFlatButton:
+                            text: "Adana Kebab - 1500¥"
+                            theme_text_color: "Custom"
+                            text_color: "black"
+                            line_color: "gray"
+                            on_release: root.add_to_order(self.text)
+                            size_hint_y: None
+                            height: dp(50)
+
+                        MDRectangleFlatButton:
+                            text: "Iskender Kebab - 1800¥"
+                            theme_text_color: "Custom"
+                            text_color: "black"
+                            line_color: "gray"
+                            on_release: root.add_to_order(self.text)
+                            size_hint_y: None
+                            height: dp(50)
+
+                        MDRectangleFlatButton:
+                            text: "Lahmacun - 1200¥"
+                            theme_text_color: "Custom"
+                            text_color: "black"
+                            line_color: "gray"
+                            on_release: root.add_to_order(self.text)
+                            size_hint_y: None
+                            height: dp(50)
+
+                        MDRectangleFlatButton:
+                            text: "Pide - 1400¥"
+                            theme_text_color: "Custom"
+                            text_color: "black"
+                            line_color: "gray"
+                            on_release: root.add_to_order(self.text)
+                            size_hint_y: None
+                            height: dp(50)
+
+                        MDRectangleFlatButton:
+                            text: "Manti - 1300¥"
+                            theme_text_color: "Custom"
+                            text_color: "black"
+                            line_color: "gray"
+                            on_release: root.add_to_order(self.text)
+                            size_hint_y: None
+                            height: dp(50)
+
+                        MDRectangleFlatButton:
+                            text: "Etli Ekmek - 1500¥"
+                            theme_text_color: "Custom"
+                            text_color: "black"
+                            line_color: "gray"
+                            on_release: root.add_to_order(self.text)
+                            size_hint_y: None
+                            height: dp(50)
+
+                        MDRectangleFlatButton:
+                            text: "Tavuk Sis - 1400¥"
+                            theme_text_color: "Custom"
+                            text_color: "black"
+                            line_color: "gray"
+                            on_release: root.add_to_order(self.text)
+                            size_hint_y: None
+                            height: dp(50)
+
+                        MDRectangleFlatButton:
+                            text: "Kuzu Tandir - 2000¥"
+                            theme_text_color: "Custom"
+                            text_color: "black"
+                            line_color: "gray"
+                            on_release: root.add_to_order(self.text)
+                            size_hint_y: None
+                            height: dp(50)
+
+                        MDRectangleFlatButton:
+                            text: "Kuru Fasulye - 1100¥"
+                            theme_text_color: "Custom"
+                            text_color: "black"
+                            line_color: "gray"
+                            on_release: root.add_to_order(self.text)
+                            size_hint_y: None
+                            height: dp(50)
+
+                        MDRectangleFlatButton:
+                            text: "Ciger Tava - 1400¥"
+                            theme_text_color: "Custom"
+                            text_color: "black"
+                            line_color: "gray"
+                            on_release: root.add_to_order(self.text)
+                            size_hint_y: None
+                            height: dp(50)
+
+                        MDLabel:
+                            text: "Sweeties"
+                            size_hint_y: None
+                            height: dp(40)
+                            halign: "center"
+                            theme_text_color: "Primary"
+                            md_bg_color: 0.8, 0.8, 0.8, 1
+
+
+
+                        MDRectangleFlatButton:
+                            text: "Baklava - 800¥"
+                            theme_text_color: "Custom"
+                            text_color: "black"
+                            line_color: "gray"
+                            on_release: root.add_to_order(self.text)
+                            size_hint_y: None
+                            height: dp(50)
+
+                        MDRectangleFlatButton:
+                            text: "Kunefe - 900¥"
+                            theme_text_color: "Custom"
+                            text_color: "black"
+                            line_color: "gray"
+                            on_release: root.add_to_order(self.text)
+                            size_hint_y: None
+                            height: dp(50)
+
+                        MDRectangleFlatButton:
+                            text: "Sutlac - 700¥"
+                            theme_text_color: "Custom"
+                            text_color: "black"
+                            line_color: "gray"
+                            on_release: root.add_to_order(self.text)
+                            size_hint_y: None
+                            height: dp(50)
+
+                        MDLabel:
+                            text: "Drinks"
+                            size_hint_y: None
+                            height: dp(40)
+                            halign: "center"
+                            theme_text_color: "Primary"
+                            md_bg_color: 0.8, 0.8, 0.8, 1
+
+
+
+                        MDRectangleFlatButton:
+                            text: "Ayran - 300¥"
+                            theme_text_color: "Custom"
+                            text_color: "black"
+                            line_color: "gray"
+                            on_release: root.add_to_order(self.text)
+                            size_hint_y: None
+                            height: dp(50)
+
+                        MDRectangleFlatButton:
+                            text: "Salgam Suyu - 350¥"
+                            theme_text_color: "Custom"
+                            text_color: "black"
+                            line_color: "gray"
+                            on_release: root.add_to_order(self.text)
+                            size_hint_y: None
+                            height: dp(50)
+
+                        MDRectangleFlatButton:
+                            text: "Cay - 250¥"
+                            theme_text_color: "Custom"
+                            text_color: "black"
+                            line_color: "gray"
+                            on_release: root.add_to_order(self.text)
+                            size_hint_y: None
+                            height: dp(50)
+
+                        MDRectangleFlatButton:
+                            text: "Turk Kahvesi - 400¥"
+                            theme_text_color: "Custom"
+                            text_color: "black"
+                            line_color: "gray"
+                            on_release: root.add_to_order(self.text)
+                            size_hint_y: None
+                            height: dp(50)
+
+                        MDRectangleFlatButton:
+                            text: "Boza - 500¥"
+                            theme_text_color: "Custom"
+                            text_color: "black"
+                            line_color: "gray"
+                            on_release: root.add_to_order(self.text)
+                            size_hint_y: None
+                            height: dp(50)
+
+                        MDRectangleFlatButton:
+                            text: "Limonata - 450¥"
+                            theme_text_color: "Custom"
+                            text_color: "black"
+                            line_color: "gray"
+                            on_release: root.add_to_order(self.text)
+                            size_hint_y: None
+                            height: dp(50)
+
+                        MDRectangleFlatButton:
+                            text: "Visne Suyu - 400¥"
+                            theme_text_color: "Custom"
+                            text_color: "black"
+                            line_color: "gray"
+                            on_release: root.add_to_order(self.text)
+                            size_hint_y: None
+                            height: dp(50)
+
+            # Bottom Left - Price (0.35, 0.35)
+            BoxLayout:
+                size_hint_x: 0.35
+                size_hint_y: 0.35
+                orientation: 'vertical'
+                canvas.before:
+                    Color:
+                        rgba: 0, 0, 0, 1
+                    Line:
+                        rectangle: self.x, self.y, self.width, self.height
+                        width: 2
+
+                MDLabel:
+                    text: "Price"
+                    size_hint_y: None
+                    height: dp(40)
+                    halign: "center"
+                    theme_text_color: "Primary"
+                    md_bg_color: 0.9, 0.9, 0.9, 1
+
+                ScrollView:
+                    do_scroll_x: False
+                    do_scroll_y: True
+
+                    MDLabel:
+                        id: price_label
+                        text: "Food: 0¥\nService Charge (3%): 0¥\nTax (2%): 0¥\nTotal: 0¥"
+                        halign: "left"
+                        valign: "top"
+                        size_hint_y: None
+                        height: self.texture_size[1]
+                        padding: dp(10), dp(10)
+
+                MDRectangleFlatButton:
+                    text: "Print Bill"
+                    theme_text_color: "Custom"
+                    text_color: "black"
+                    line_color: "gray"
+                    on_release: root.print_bill()
+                    size_hint_x: 1
+                    size_hint_y: None
+                    height: dp(50)
+
+            # Bottom Right - Food Overview (0.65, 0.35)
+            BoxLayout:
+                size_hint_x: 0.65
+                size_hint_y: 0.35
+                orientation: 'vertical'
+                canvas.before:
+                    Color:
+                        rgba: 0, 0, 0, 1
+                    Line:
+                        rectangle: self.x, self.y, self.width, self.height
+                        width: 2
+
+                MDLabel:
+                    text: "Food Overview"
+                    size_hint_y: None
+                    height: dp(40)
+                    halign: "center"
+                    theme_text_color: "Primary"
+                    md_bg_color: 0.9, 0.9, 0.9, 1
+
+                MDLabel:
+                    id: food_overview_label
+                    text: "Food selected will appear here"
+                    halign: "center"
+                    valign: "center"
+                    size_hint_y: 0.5
+
+
+<QuantityDialog>:
+    orientation: "vertical"
+    spacing: "12dp"
+    size_hint_y: None
+    height: "120dp"
+
+    MDLabel:
+        id: food_info_label
+        text: f"{root.food_name} - {root.food_price}"
+        halign: "center"
+
+    MDTextField:
+        id: quantity_input
+        hint_text: "Quantity"
+        text: "1"
+        input_filter: "int"
+        halign: "center"
+
+    MDLabel:
+        id: error_label
+        text: ""
+        theme_text_color: "Error"
+        halign: "center"
+        size_hint_y: None
+        height: self.texture_size[1]
+
+
+<Waiter_Inside>:
+    name: "Waiter_Inside"
+    BoxLayout:
+        orientation: 'vertical'
+        padding: [dp(20), dp(20), dp(20), dp(20)]
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: dp(56)
+            MDCard:
+                size_hint_x: 0.5
+                md_bg_color: 0.9, 0.9, 0.9, 1
+                MDLabel:
+                    text: "Inside (Waiter View)"
+                    halign: "center"
+                    theme_text_color: "Primary"
+
+        FloatLayout:
+            canvas.before:
+                Color:
+                    rgba: 0, 0, 0, 1
+                Line:
+                    rectangle: self.x, self.y, self.width, self.height
+                    width: 2
+
+            # Cash Register
+            MDRectangleFlatButton:
+                size_hint: 0.15, 0.07
+                pos_hint: {"x": 0.01, "top": 0.98}
+                text: "Cash Register"
+                theme_text_color: "Custom"
+                text_color: "black"
+                line_color: "black"
+
+            # Terrace Label
+            MDRectangleFlatButton:
+                size_hint: 0.15, 0.07
+                pos_hint:{"x": 0.845, "top": 0.998}
+                text: "Terrace"
+                theme_text_color: "Custom"
+                text_color: "black"
+                line_color: "black"
+                on_release: root.manager.current = "Waiter_Terrace"
+
+            # Terrace Button
+            MDIconButton:
+                icon: "arrow-right-bold-box-outline"
+                size_hint: None, None
+                size: dp(48), dp(48)
+                pos_hint: {"right": 1, "top": 1}
+                on_release: root.manager.current = "Waiter_Terrace"
+
+            # First Column
+            CustomRectButton:
+                id: table_1
+                text: "1"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.05, "top": 0.85}
+                on_release: root.manager.current = "Table_Waiter"
+                on_release: root.select_table(1)
+            CustomRectButton:
+                id: table_2
+                text: "2"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.05, "top": 0.65}
+                on_release: root.select_table(2)
+            CustomRectButton:
+                id: table_3
+                text: "3"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.05, "top": 0.45}
+                on_release: root.select_table(3)
+            CustomRectButton:
+                id: table_4
+                text: "4"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.05, "top": 0.25}
+                on_release: root.select_table(4)
+
+            # Upper tables
+            CustomRectButton:
+                id: table_5
+                text: "5"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.18, "top": 0.95}
+                on_release: root.select_table(5)
+            CustomRectButton:
+                id: table_6
+                text: "6"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.33, "top": 0.95}
+                on_release: root.select_table(6)
+            CustomRectButton:
+                id: table_7
+                text: "7"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.48, "top": 0.95}
+                on_release: root.select_table(7)
+            CustomRectButton:
+                id: table_8
+                text: "8"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.63, "top": 0.95}
+                on_release: root.select_table(8)
+
+            # Lower tables
+            CustomRectButton:
+                id: table_9
+                text: "9"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.18, "top": 0.14}
+                on_release: root.select_table(9)
+            CustomRectButton:
+                id: table_10
+                text: "10"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.33, "top": 0.14}
+                on_release: root.select_table(10)
+            CustomRectButton:
+                id: table_11
+                text: "11"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.48, "top": 0.14}
+                on_release: root.select_table(11)
+            CustomRectButton:
+                id: table_12
+                text: "12"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.63, "top": 0.14}
+                on_release: root.select_table(12)
+
+            # Last Column
+            CustomRectButton:
+                id: table_20
+                text: "20"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.75, "top": 0.85}
+                on_release: root.select_table(20)
+            CustomRectButton:
+                id: table_21
+                text: "21"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.75, "top": 0.25}
+                on_release: root.select_table(21)
+
+            # Central Circular Tables
+            CustomCircleButton:
+                id: table_13
+                text: "13"
+                size_hint: 0.12, 0.12
+                pos_hint: {"center_x": 0.27, "top": 0.565}
+                on_release: root.select_table(13)
+            CustomCircleButton:
+                id: table_14
+                text: "14"
+                size_hint: 0.12, 0.12
+                pos_hint: {"center_x": 0.375, "top": 0.765}
+                on_release: root.select_table(14)
+            CustomCircleButton:
+                id: table_15
+                text: "15"
+                size_hint: 0.12, 0.12
+                pos_hint: {"center_x": 0.375, "top": 0.365}
+                on_release: root.select_table(15)
+
+            CustomCircleButton:
+                id: table_16
+                text: "16"
+                size_hint: 0.12, 0.12
+                pos_hint: {"center_x": 0.48, "top": 0.565}
+                on_release: root.select_table(16)
+            CustomCircleButton:
+                id: table_17
+                text: "17"
+                size_hint: 0.12, 0.12
+                pos_hint: {"center_x": 0.585, "top": 0.765}
+                on_release: root.select_table(17)
+            CustomCircleButton:
+                id: table_18
+                text: "18"
+                size_hint: 0.12, 0.12
+                pos_hint: {"center_x": 0.585, "top": 0.365}
+                on_release: root.select_table(18)
+
+            CustomCircleButton:
+                id: table_19
+                text: "19"
+                size_hint: 0.12, 0.12
+                pos_hint: {"center_x": 0.69, "top": 0.565}
+                on_release: root.select_table(19)
+
+            # Music icon
+            MDIconButton:
+                icon: "music"
+                size_hint: 0.2,0.2
+                pos_hint: {"center_x": 0.9, "center_y": 0.5}
+
+            # Entrance Label
+            MDRectangleFlatButton:
+                size_hint: 0.15, 0.07
+                pos_hint: {"x": 0.01, "y": 0.01}
+                text: "Entrance"
+                theme_text_color: "Custom"
+                text_color: "black"
+                line_color: "black"
+
+            # Logout Button and Label
+            MDRectangleFlatButton:
+                size_hint: 0.15, 0.07
+                pos_hint: {"x": 0.845, "y": 0.01}
+                text: "Logout"
+                theme_text_color: "Custom"
+                text_color: "black"
+                line_color: "black"
+                on_release: root.manager.current = "LoginScreen"
+
+            MDIconButton:
+                icon: "logout"
+                size_hint: None, None
+                size: dp(24), dp(24)
+                pos_hint: {"right": 1, "y": 0.01}
+                on_release: root.manager.current = "LoginScreen"
+<Waiter_Terrace>:
+    name: "Waiter_Terrace"
+    BoxLayout:
+        orientation: 'vertical'
+        padding: [dp(20), dp(20), dp(20), dp(20)]
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: dp(56)
+            MDCard:
+                size_hint_x: 0.5
+                md_bg_color: 0.9, 0.9, 0.9, 1
+                MDLabel:
+                    text: "Terrace (Waiter View)"
+                    halign: "center"
+                    theme_text_color: "Primary"
+
+        FloatLayout:
+            canvas.before:
+                Color:
+                    rgba: 0, 0, 0, 1
+                Line:
+                    rectangle: self.x, self.y, self.width, self.height
+                    width: 2
+            # Inside Label
+            MDRectangleFlatButton:
+                size_hint: 0.15, 0.07
+                pos_hint:{"x": 0.01, "top": 0.996}
+                text: "Inside"
+                theme_text_color: "Custom"
+                text_color: "black"
+                line_color: "black"
+                on_release: root.manager.current = "Waiter_Inside"
+            # Inside Button
+            MDIconButton:
+                icon: "arrow-left-bold-box-outline"  # Use a KivyMD icon
+                size_hint: None, None
+                size: dp(48), dp(48)
+                pos_hint: {"x": 0.01, "top": 1}  # Top-left corner
+                on_release: root.manager.current = "Waiter_Inside"
+
+            # First Column
+            CustomCircleButton:
+                id: table_22
+                text: "22"
+                size_hint: 0.12, 0.12
+                pos_hint: {"x": 0.035, "top": 0.865}
+                on_release: root.select_table(22)
+
+            CustomCircleButton:
+                id: table_23
+                text: "23"
+                size_hint: 0.12, 0.12
+                pos_hint: {"x": 0.035, "top": 0.565}
+                on_release: root.select_table(23)
+
+            CustomCircleButton:
+                id: table_24
+                text: "24"
+                size_hint: 0.12, 0.12
+                pos_hint: {"x": 0.035, "top": 0.265}
+                on_release: root.select_table(24)
+
+            # Second Column
+            CustomCircleButton:
+                id: table_25
+                text: "25"
+                size_hint: 0.12, 0.12
+                pos_hint: {"x": 0.18, "top": 0.715}
+                on_release: root.select_table(25)
+
+            CustomCircleButton:
+                id: table_26
+                text: "26"
+                size_hint: 0.12, 0.12
+                pos_hint: {"x": 0.18, "top": 0.415}
+                on_release: root.select_table(26)
+
+            # Fourth Column
+            CustomCircleButton:
+                id: table_35
+                text: "35"
+                size_hint: 0.12, 0.12
+                pos_hint: {"x": 0.855, "top": 0.865}
+                on_release: root.select_table(35)
+
+            CustomCircleButton:
+                id: table_36
+                text: "36"
+                size_hint: 0.12, 0.12
+                pos_hint: {"x": 0.855, "top": 0.565}
+                on_release: root.select_table(36)
+
+            CustomCircleButton:
+                id: table_37
+                text: "37"
+                size_hint: 0.12, 0.12
+                pos_hint: {"x": 0.855, "top": 0.265}
+                on_release: root.select_table(37)
+
+            # Third Column
+            CustomCircleButton:
+                id: table_33
+                text: "33"
+                size_hint: 0.12, 0.12
+                pos_hint: {"x": 0.71, "top": 0.715}
+                on_release: root.select_table(33)
+
+            CustomCircleButton:
+                id: table_34
+                text: "34"
+                size_hint: 0.12, 0.12
+                pos_hint: {"x": 0.71, "top": 0.415}
+                on_release: root.select_table(34)
+
+            # Upper Tables
+            CustomRectButton:
+                id: table_27
+                text: "27"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.25, "top": 0.95}
+                on_release: root.select_table(27)
+            CustomRectButton:
+                id: table_28
+                text: "28"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.43, "top": 0.95}
+                on_release: root.select_table(28)
+            CustomRectButton:
+                id: table_29
+                text: "29"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.61, "top": 0.95}
+                on_release: root.select_table(29)
+
+            # Lower Tables
+            CustomRectButton:
+                id: table_30
+                text: "30"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.25, "top": 0.14}
+                on_release: root.select_table(30)
+            CustomRectButton:
+                id: table_31
+                text: "31"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.43, "top": 0.14}
+                on_release: root.select_table(31)
+            CustomRectButton:
+                id: table_32
+                text: "32"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.61, "top": 0.14}
+                on_release: root.select_table(32)
+            # Music icon
+            MDIconButton:
+                icon: "music"
+                size_hint: 0.2,0.2
+                pos_hint: {"center_x": 0.5, "center_y": 0.5}
+
+            # Logout Label
+            MDRectangleFlatButton:
+                size_hint: 0.15, 0.07
+                pos_hint: {"x": 0.01, "y": 0.007}
+                text: "Logout"
+                theme_text_color: "Custom"
+                text_color: "black"
+                line_color: "black"
+                on_release: root.manager.current = "LoginScreen"
+            # Logout Button
+            MDIconButton:
+                icon: "logout"
+                size_hint: None, None
+                size: dp(48), dp(48)
+                pos_hint: {"x": 0.01, "y": 0.01}  # Bottom-left corner
+                on_release: root.manager.current = "Login_Screen"
+<Table_Admin_Available>:
+    name: "Table_Admin_Available"
+    BoxLayout:
+        orientation: 'vertical'
+        padding: [dp(20), dp(20), dp(20), dp(20)]
+        spacing: dp(10)
+
+        # Top header
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: dp(56)
+            MDCard:
+                size_hint_x: 0.9
+                md_bg_color: 0.9, 0.9, 0.9, 1
+                MDLabel:
+                    text: f"Table {root.selected_table_admin} - Available"
+                    halign: "center"
+                    theme_text_color: "Primary"
+            MDIconButton:
+                size_hint_x: 0.1
+                icon: "logout"
+                md_bg_color: 0.9, 0.9, 0.9, 1
+                pos_hint: {"right": 1, "center_y": 0.5}
+                on_release: root.manager.current = "Admin_Inside"
+
+        GridLayout:
+            cols: 2
+            rows: 2
+            spacing: dp(1)
+
+            # Top Left - Orders (0.35, 0.65)
+            BoxLayout:
+                size_hint_x: 0.35
+                size_hint_y: 0.65
+                orientation: 'vertical'
+                canvas.before:
+                    Color:
+                        rgba: 0, 0, 0, 1
+                    Line:
+                        rectangle: self.x, self.y, self.width, self.height
+                        width: 2
+
+                MDLabel:
+                    text: "Ordered Items"
+                    size_hint_y: None
+                    height: dp(40)
+                    halign: "center"
+                    theme_text_color: "Primary"
+                    md_bg_color: 0.9, 0.9, 0.9, 1
+
+                MDLabel:
+                    text: ""
+                    theme_text_color: "Primary"
+                    md_bg_color: 1,1,1,1
+
+
+            # Top Right - Table Information (0.65, 0.65)
+            BoxLayout:
+                size_hint_x: 0.65
+                size_hint_y: 1
+                orientation: 'vertical'
+                canvas.before:
+                    Color:
+                        rgba: 0, 0, 0, 1
+                    Line:
+                        rectangle: self.x, self.y, self.width, self.height
+                        width: 2
+
+                MDLabel:
+                    text: "Table Information"
+                    size_hint_y: None
+                    height: dp(40)
+                    halign: "center"
+                    theme_text_color: "Primary"
+                    md_bg_color: 0.9, 0.9, 0.9, 1
+
+                MDLabel:
+                    text: "This table is available for use by waiters."
+                    font_size: '20sp'
+                    size_hint_x: 0.4
+                    size_hint_y: 0.2
+                    halign: 'center'
+                    pos_hint: {"x": 0.3, "y": 0.7}
+
+            # Bottom Left - Price (0.35, 0.35)
+            BoxLayout:
+                size_hint_x: 0.35
+                size_hint_y: 0.35
+                orientation: 'vertical'
+                canvas.before:
+                    Color:
+                        rgba: 0, 0, 0, 1
+                    Line:
+                        rectangle: self.x, self.y, self.width, self.height
+                        width: 2
+
+                MDLabel:
+                    text: "Price"
+                    size_hint_y: None
+                    height: dp(40)
+                    halign: "center"
+                    theme_text_color: "Primary"
+                    md_bg_color: 0.9, 0.9, 0.9, 1
+
+                ScrollView:
+                    do_scroll_x: False
+                    do_scroll_y: True
+
+                    MDLabel:
+                        id: price_label
+                        text: "Food: 0¥\nService Charge (3%): 0¥\nTax (2%): 0¥\nTotal: 0¥"
+                        halign: "left"
+                        valign: "top"
+                        size_hint_y: None
+                        height: self.texture_size[1]
+                        padding: dp(10), dp(10)
+
+                MDRectangleFlatButton:
+                    text: "Print Bill"
+                    theme_text_color: "Custom"
+                    text_color: "black"
+                    line_color: "gray"
+                    size_hint_x: 1
+                    size_hint_y: None
+                    height: dp(50)
+
+
+
+
+<Table_Admin_Occupied>:
+    name: "Table_Admin_Occupied"
+    BoxLayout:
+        orientation: 'vertical'
+        padding: [dp(20), dp(20), dp(20), dp(20)]
+        spacing: dp(10)
+
+        # Top header
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: dp(56)
+            MDCard:
+                size_hint_x: 0.9
+                md_bg_color: 0.9, 0.9, 0.9, 1
+                MDLabel:
+                    id: table_title  
+                    text: "Table {} - Occupied".format(root.selected_table_admin)
+                    halign: "center"
+                    theme_text_color: "Primary"
+            MDIconButton:
+                size_hint_x: 0.1
+                icon: "logout"
+                md_bg_color: 0.9, 0.9, 0.9, 1
+                pos_hint: {"right": 1, "center_y": 0.5}
+                on_release: root.manager.current = "Admin_Inside"
+
+        GridLayout:
+            cols: 2
+            rows: 2
+            spacing: dp(1)
+
+            # Top Left - Orders (0.35, 0.65)
+            BoxLayout:
+                size_hint_x: 0.35
+                size_hint_y: 0.65
+                orientation: 'vertical'
+                canvas.before:
+                    Color:
+                        rgba: 0, 0, 0, 1
+                    Line:
+                        rectangle: self.x, self.y, self.width, self.height
+                        width: 2
+
+                MDLabel:
+                    text: "Ordered Items"
+                    size_hint_y: None
+                    height: dp(40)
+                    halign: "center"
+                    theme_text_color: "Primary"
+                    md_bg_color: 0.9, 0.9, 0.9, 1
+
+                ScrollView:
+                    MDList:
+                        id: ordered_items_list
+
+            # Top Right - Table Information (0.65, 0.65)
+            BoxLayout:
+                size_hint_x: 0.65
+                size_hint_y: 0.65
+                orientation: 'vertical'
+                canvas.before:
+                    Color:
+                        rgba: 0, 0, 0, 1
+                    Line:
+                        rectangle: self.x, self.y, self.width, self.height
+                        width: 2
+
+                MDLabel:
+                    text: "Table Information"
+                    size_hint_y: None
+                    height: dp(40)
+                    halign: "center"
+                    theme_text_color: "Primary"
+                    md_bg_color: 0.9, 0.9, 0.9, 1
+                MDBoxLayout:
+                    orientation: "vertical"
+
+
+                    MDLabel:
+                        text: "This table is occupied. Please Finish/Cancel the order to make it available for other orders."
+                        font_size: '20sp'
+                        size_hint_x: 0.4
+                        size_hint_y: 0.2
+                        halign: 'center'
+
+
+            # Bottom Left - Price (0.35, 0.35)
+            BoxLayout:
+                size_hint_x: 0.35
+                size_hint_y: 0.35
+                orientation: 'vertical'
+                canvas.before:
+                    Color:
+                        rgba: 0, 0, 0, 1
+                    Line:
+                        rectangle: self.x, self.y, self.width, self.height
+                        width: 2
+
+                MDLabel:
+                    text: "Price"
+                    size_hint_y: None
+                    height: dp(40)
+                    halign: "center"
+                    theme_text_color: "Primary"
+                    md_bg_color: 0.9, 0.9, 0.9, 1
+
+                ScrollView:
+                    do_scroll_x: False
+                    do_scroll_y: True
+
+                    MDLabel:
+                        id: price_label
+                        text: "Food: 0¥\nService Charge (3%): 0¥\nTax (2%): 0¥\nTotal: 0¥"
+                        halign: "left"
+                        valign: "top"
+                        size_hint_y: None
+                        height: self.texture_size[1]
+                        padding: dp(10), dp(10)
+
+                MDRectangleFlatButton:
+                    text: "Print Bill"
+                    theme_text_color: "Custom"
+                    text_color: "black"
+                    line_color: "gray"
+                    size_hint_x: 1
+                    size_hint_y: None
+                    height: dp(50)
+                    on_release: root.print_bill()
+
+            # Bottom Right - Operations (0.65, 0.35)
+            BoxLayout:
+                id: operations_layout
+                size_hint_x: 0.65
+                size_hint_y: 0.35
+                orientation: 'vertical'
+                canvas.before:
+                    Color:
+                        rgba: 0, 0, 0, 1
+                    Line:
+                        rectangle: self.x, self.y, self.width, self.height
+                        width: 2
+
+                MDLabel:
+                    text: "Operations"
+                    size_hint_y: None
+                    height: dp(40)
+                    halign: "center"
+                    theme_text_color: "Primary"
+                    md_bg_color: 0.9, 0.9, 0.9, 1
+
+                MDRoundFlatButton:
+                    text: "Cancel the order"
+                    on_release: root.cancel_order(self)  
+
+                MDRoundFlatButton:
+                    text: "Finish the order"
+                    on_release: root.finish_order(self)  
+
+
+<Admin_Inside>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: [dp(20), dp(20), dp(20), dp(20)]
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: dp(56)
+            MDCard:
+                size_hint_x: 0.5
+                md_bg_color: 0.9, 0.9, 0.9, 1
+                MDLabel:
+                    text: "Terrace (Admin View)"
+                    halign: "center"
+                    theme_text_color: "Primary"
+
+        FloatLayout:
+            canvas.before:
+                Color:
+                    rgba: 0, 0, 0, 1
+                Line:
+                    rectangle: self.x, self.y, self.width, self.height
+                    width: 2
+
+            # Cash Register
+            MDRectangleFlatButton:
+                size_hint: 0.15, 0.07
+                pos_hint: {"x": 0.01, "top": 0.98}
+                text: "Cash Register/Ongoing Orders"
+                theme_text_color: "Custom"
+                text_color: "black"
+                line_color: "black"
+                on_release: root.manager.current = "Ongoing_Orders"
+
+            # Terrace Label
+            MDRectangleFlatButton:
+                size_hint: 0.15, 0.07
+                pos_hint:{"x": 0.845, "top": 0.998}
+                text: "Terrace"
+                theme_text_color: "Custom"
+                text_color: "black"
+                line_color: "black"
+                on_release: root.manager.current = "Admin_Terrace"
+
+            # Terrace Button
+            MDIconButton:
+                icon: "arrow-right-bold-box-outline"
+                size_hint: None, None
+                size: dp(48), dp(48)
+                pos_hint: {"right": 1, "top": 1}
+                on_release: root.manager.current = "Admin_Terrace"
+
+            # First Column
+            CustomRectButton:
+                id: table_1
+                text: "1"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.05, "top": 0.85}
+                on_release: root.select_table_admin(1)
+            CustomRectButton:
+                id: table_2
+                text: "2"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.05, "top": 0.65}
+                on_release: root.select_table_admin(2)
+            CustomRectButton:
+                id: table_3
+                text: "3"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.05, "top": 0.45}
+                on_release: root.select_table_admin(3)
+            CustomRectButton:
+                id: table_4
+                text: "4"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.05, "top": 0.25}
+                on_release: root.select_table_admin(4)
+
+            # Upper tables
+            CustomRectButton:
+                id: table_5
+                text: "5"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.18, "top": 0.95}
+                on_release: root.select_table_admin(5)
+            CustomRectButton:
+                id: table_6
+                text: "6"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.33, "top": 0.95}
+                on_release: root.select_table_admin(6)
+            CustomRectButton:
+                id: table_7
+                text: "7"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.48, "top": 0.95}
+                on_release: root.select_table_admin(7)
+            CustomRectButton:
+                id: table_8
+                text: "8"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.63, "top": 0.95}
+                on_release: root.select_table_admin(8)
+
+            # Lower tables
+            CustomRectButton:
+                id: table_9
+                text: "9"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.18, "top": 0.14}
+                on_release: root.select_table_admin(9)
+            CustomRectButton:
+                id: table_10
+                text: "10"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.33, "top": 0.14}
+                on_release: root.select_table_admin(10)
+            CustomRectButton:
+                id: table_11
+                text: "11"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.48, "top": 0.14}
+                on_release: root.select_table_admin(11)
+            CustomRectButton:
+                id: table_12
+                text: "12"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.63, "top": 0.14}
+                on_release: root.select_table_admin(12)
+
+            # Last Column
+            CustomRectButton:
+                id: table_20
+                text: "20"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.75, "top": 0.85}
+                on_release: root.select_table_admin(20)
+            CustomRectButton:
+                id: table_21
+                text: "21"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.75, "top": 0.25}
+                on_release: root.select_table_admin(21)
+
+            # Central Circular Tables
+            CustomCircleButton:
+                id: table_13
+                text: "13"
+                size_hint: 0.12, 0.12
+                pos_hint: {"center_x": 0.27, "top": 0.565}
+                on_release: root.select_table_admin(13)
+            CustomCircleButton:
+                id: table_14
+                text: "14"
+                size_hint: 0.12, 0.12
+                pos_hint: {"center_x": 0.375, "top": 0.765}
+                on_release: root.select_table_admin(14)
+            CustomCircleButton:
+                id: table_15
+                text: "15"
+                size_hint: 0.12, 0.12
+                pos_hint: {"center_x": 0.375, "top": 0.365}
+                on_release: root.select_table_admin(15)
+
+            CustomCircleButton:
+                id: table_16
+                text: "16"
+                size_hint: 0.12, 0.12
+                pos_hint: {"center_x": 0.48, "top": 0.565}
+                on_release: root.select_table_admin(16)
+            CustomCircleButton:
+                id: table_17
+                text: "17"
+                size_hint: 0.12, 0.12
+                pos_hint: {"center_x": 0.585, "top": 0.765}
+                on_release: root.select_table_admin(17)
+            CustomCircleButton:
+                id: table_18
+                text: "18"
+                size_hint: 0.12, 0.12
+                pos_hint: {"center_x": 0.585, "top": 0.365}
+                on_release: root.select_table_admin(18)
+
+            CustomCircleButton:
+                id: table_19
+                text: "19"
+                size_hint: 0.12, 0.12
+                pos_hint: {"center_x": 0.69, "top": 0.565}
+                on_release: root.select_table_admin(19)
+
+            # Music icon
+            MDIconButton:
+                icon: "music"
+                size_hint: 0.2,0.2
+                pos_hint: {"center_x": 0.9, "center_y": 0.5}
+
+            # Entrance Label
+            MDRectangleFlatButton:
+                size_hint: 0.15, 0.07
+                pos_hint: {"x": 0.01, "y": 0.01}
+                text: "Entrance"
+                theme_text_color: "Custom"
+                text_color: "black"
+                line_color: "black"
+
+            # Logout Button and Label
+            MDRectangleFlatButton:
+                size_hint: 0.15, 0.07
+                pos_hint: {"x": 0.845, "y": 0.01}
+                text: "Logout"
+                theme_text_color: "Custom"
+                text_color: "black"
+                line_color: "black"
+                on_release: root.manager.current = "LoginScreen"
+
+            MDIconButton:
+                icon: "logout"
+                size_hint: None, None
+                size: dp(24), dp(24)
+                pos_hint: {"right": 1, "y": 0.01}
+                on_release: root.manager.current = "LoginScreen"
+
+
+<Ongoing_Orders>:
+    MDLabel:
+        pos_hint:{'center_x':0.5, 'center_y':0.9}
+        halign: 'center'
+        text: 'Ongoing Orders'
+        font_style:'H2'
+        size_hint: .8, 0.08
+    MDBoxLayout:
+        orientation:'horizontal'
+        size_hint:0.8, 0.2
+        pos_hint:{'center_x': 0.8, 'top': 0.3}
+        spacing:"10dp"
+
+        MDRaisedButton:
+            text:"Go Back"
+            pos_hint_x: 0.5
+            theme_text_color: "Custom"
+            text_color: "black"
+            md_bg_color: 0.9, 0.9, 0.9, 1
+            on_release: root.manager.current = "Admin_Inside"
+
+
+
+<Admin_Terrace>:
+    name: "Admin_Terrace"
+    BoxLayout:
+        orientation: 'vertical'
+        padding: [dp(20), dp(20), dp(20), dp(20)]
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: dp(56)
+            MDCard:
+                size_hint_x: 0.5
+                md_bg_color: 0.9, 0.9, 0.9, 1
+                MDLabel:
+                    text: "Terrace (Admin View)"
+                    halign: "center"
+                    theme_text_color: "Primary"
+
+
+        FloatLayout:
+            canvas.before:
+                Color:
+                    rgba: 0, 0, 0, 1
+                Line:
+                    rectangle: self.x, self.y, self.width, self.height
+                    width: 2
+            # Inside Label
+            MDRectangleFlatButton:
+                size_hint: 0.15, 0.07
+                pos_hint:{"x": 0.01, "top": 0.996}
+                text: "Inside"
+                theme_text_color: "Custom"
+                text_color: "black"
+                line_color: "black"
+                on_release: root.manager.current = "Admin_Inside"
+            # Inside Button
+            MDIconButton:
+                icon: "arrow-left-bold-box-outline"  
+                size_hint: None, None
+                size: dp(48), dp(48)
+                pos_hint: {"x": 0.01, "top": 1} 
+                on_release: root.manager.current = "Admin_Inside"
+
+            # First Column
+            CustomCircleButton:
+                id: table_22
+                text: "22"
+                size_hint: 0.12, 0.12
+                pos_hint: {"x": 0.035, "top": 0.865}
+                on_release: root.select_table_admin(22)
+
+            CustomCircleButton:
+                id: table_23
+                text: "23"
+                size_hint: 0.12, 0.12
+                pos_hint: {"x": 0.035, "top": 0.565}
+                on_release: root.select_table_admin(23)
+
+            CustomCircleButton:
+                id: table_24
+                text: "24"
+                size_hint: 0.12, 0.12
+                pos_hint: {"x": 0.035, "top": 0.265}
+                on_release: root.select_table_admin(24)
+
+            # Second Column
+            CustomCircleButton:
+                id: table_25
+                text: "25"
+                size_hint: 0.12, 0.12
+                pos_hint: {"x": 0.18, "top": 0.715}
+                on_release: root.select_table_admin(25)
+
+            CustomCircleButton:
+                id: table_26
+                text: "26"
+                size_hint: 0.12, 0.12
+                pos_hint: {"x": 0.18, "top": 0.415}
+                on_release: root.select_table_admin(26)
+
+            # Fourth Column
+            CustomCircleButton:
+                id: table_35
+                text: "35"
+                size_hint: 0.12, 0.12
+                pos_hint: {"x": 0.855, "top": 0.865}
+                on_release: root.select_table_admin(35)
+
+            CustomCircleButton:
+                id: table_36
+                text: "36"
+                size_hint: 0.12, 0.12
+                pos_hint: {"x": 0.855, "top": 0.565}
+                on_release: root.select_table_admin(36)
+
+            CustomCircleButton:
+                id: table_37
+                text: "37"
+                size_hint: 0.12, 0.12
+                pos_hint: {"x": 0.855, "top": 0.265}
+                on_release: root.select_table_admin(37)
+
+            # Third Column
+            CustomCircleButton:
+                id: table_33
+                text: "33"
+                size_hint: 0.12, 0.12
+                pos_hint: {"x": 0.71, "top": 0.715}
+                on_release: root.select_table_admin(33)
+
+            CustomCircleButton:
+                id: table_34
+                text: "34"
+                size_hint: 0.12, 0.12
+                pos_hint: {"x": 0.71, "top": 0.415}
+                on_release: root.select_table_admin(34)
+
+            # Upper Tables
+            CustomRectButton:
+                id: table_27
+                text: "27"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.25, "top": 0.95}
+                on_release: root.select_table_admin(27)
+            CustomRectButton:
+                id: table_28
+                text: "28"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.43, "top": 0.95}
+                on_release: root.select_table_admin(28)
+            CustomRectButton:
+                id: table_29
+                text: "29"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.61, "top": 0.95}
+                on_release: root.select_table_admin(29)
+
+            # Lower Tables
+            CustomRectButton:
+                id: table_30
+                text: "30"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.25, "top": 0.14}
+                on_release: root.select_table_admin(30)
+            CustomRectButton:
+                id: table_31
+                text: "31"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.43, "top": 0.14}
+                on_release: root.select_table_admin(31)
+            CustomRectButton:
+                id: table_32
+                text: "32"
+                size_hint: 0.15, 0.08
+                pos_hint: {"x": 0.61, "top": 0.14}
+                on_release: root.select_table_admin(32)
+
+            # Music icon
+            MDIconButton:
+                icon: "music"
+                size_hint: 0.2,0.2
+                pos_hint: {"center_x": 0.5, "center_y": 0.5}
+
+            # Logout Label
+            MDRectangleFlatButton:
+                size_hint: 0.15, 0.07
+                pos_hint: {"x": 0.01, "y": 0.007}
+                text: "Logout"
+                theme_text_color: "Custom"
+                text_color: "black"
+                line_color: "black"
+                on_release: root.manager.current = "LoginScreen"
+            # Logout Button
+            MDIconButton:
+                icon: "logout"
+                size_hint: None, None
+                size: dp(48), dp(48)
+                pos_hint: {"x": 0.01, "y": 0.01}  # Bottom-left corner
+                on_release: root.manager.current = "Login_Screen"
