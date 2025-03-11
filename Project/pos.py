@@ -278,3 +278,34 @@ class QuantityDialog(MDBoxLayout):
             return True,quantity
         except ValueError:
             return False,"Quantity must be a number"
+
+#supportive oop classes
+class OrderedItem:
+    def __init__(self,name,price,quantity,item_id=None):
+        self.name=name
+        if isinstance(price,str) and "¥" in price:
+            self.price=int(price.split("¥")[0].strip())
+        else:
+            self.price=int(price)
+        self.quantity=quantity
+        self.total=self.price*self.quantity
+        self.item_id=item_id
+    def __str__(self):
+        return f"{self.name} x{self.quantity} - {self.price}¥ = {self.total}¥"
+
+class OrderedItem2:
+    def __init__(self,name,price,quantity,item_id=None):
+        self.name=name
+        self.price=price
+        self.quantity=quantity
+        self.item_id=item_id
+        self.total=self.price*self.quantity
+    def get_total(self):
+        return self.price*self.quantity
+
+#onelineiconlistitem for ordered items section
+class OrderItemWidget(OneLineIconListItem):
+    def __init__(self,item,**kwargs):
+        super().__init__(**kwargs)
+        self.text=f"{item.name} x{item.quantity} - {item.price}¥"
+        self.item=item
