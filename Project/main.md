@@ -27,7 +27,10 @@
 [^6]:"AQLite Is Serverless." SQLite, https://www.sqlite.org/serverless.html
 [^7]:"SqLite Advantages." Free Learning Platform For Better Future, https://www.javatpoint.com/sqlite-advantages-and-disadvantages
 [^8]:Yugulalp, Serdar. "Why you should use SQLite." Infoworld, 13 February 2019, https://www.infoworld.com/article/3331923/why-you-should-use-sqlite.html 
-
+[^9]: https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+[^10]: https://kivy.org/doc/stable/api-kivy.properties.html
+[^11]: https://kivymd.readthedocs.io/en/latest/components/dialog/
+[^12]: https://docs.python.org/3/library/threading.html
 
 
 
@@ -132,19 +135,18 @@
 
 ## List of techniques used
 
-1. *SQL Database usage and Password hashing* - **#SC4** 150 words
-2. *OOP Paradigm* - **#SC1, #SC2, #SC3, #SC4, #SC5** 50 words
-3. *Use of Dropdown Menu* - **#SC1** 100 words
-4. *Use of Data Table* - **#SC3** 100 words
-5. *Use of Properties instead of regular variables* - **#SC2, #SC3, #SC5** 50 words
-6. *Use of OneLineListItem* - **#SC2** 50 words
-7. *Use of MD Dialog* - **#SC2** 150 words
-8. *Threading method, batch update, and fixing pragma modes* - **#SC2** 150 words
-9. *Customization of Buttons* - **#SC5** 200 words
+1. *SQL Database usage and Password hashing* - **#SC4** 
+2. *OOP Paradigm* - **#SC1, #SC2, #SC3, #SC4, #SC5** 
+3. *Use of Dropdown Menu* - **#SC1** 
+4. *Use of Data Table* - **#SC3** 
+5. *Use of Properties instead of regular variables* - **#SC2, #SC3, #SC5**
+6. *Use of MD Dialog* - **#SC2**
+7. *Threading method, batch update, and fixing pragma modes* - **#SC2** 
+8. *Customization of Buttons* - **#SC5** 
 
-### 1. SQL Database usage and Password hashing - #SC4: 170 words
-To address the first part of **#SC4**, I used SQLite because it is lightweight, file-based, and it does not require a separate server, and it is ideal data storing method for a POS system. Then I started by designing the database schema to meet the project’s requirements. The schema includes four main tables : `users`, `orders`, `order_items`, and `tables`. I wrote a Python function to initialize the database and create the tables if they do not already exist. First, `users` table stores user credentials and roles:
-```.sql
+### 1. *SQL Database usage and Password hashing*- **#SC4**
+To address the first part of **#SC4**, I started designing the database tables that are relevant to project’s success criterions. I have four main tables : `users`, `orders`, `order_items`, and `tables`. I wrote function to initialize the database and create the tables if they do not already exist. First, `users` table is for storing username, password, and roles:
+```.py
 CREATE TABLE users (  
     id INTEGER PRIMARY KEY,  
     username TEXT UNIQUE,  
@@ -152,8 +154,8 @@ CREATE TABLE users (
     role TEXT DEFAULT 'waiter'  
 ); 
 ```
-Here the username is unique to prevent duplicate accounts, and the role column provides role-based access **#SC1**. Second, `orders` table tracks orders placed by users:
-```.sql
+Here the username is in text unique format so that there will be no account with same usernames, and the "role" provides role-based access, which is important for **#SC1**. Second, `orders` table records orders:
+```.py
 CREATE TABLE orders (  
     id INTEGER PRIMARY KEY AUTOINCREMENT,  
     table_id INTEGER,  
@@ -164,8 +166,8 @@ CREATE TABLE orders (
     timestamp DATETIME  
 );  
 ```
-Here the `table_id` links orders to specific tables, and the status column tracks whether an order is ongoing or finished. Third, `order_items` table stores individual items in each order:
-```.sql
+Here the `table_id` links orders to specific tables, and the status is either ongoing or finished. Third, `order_items` table stores individual items in each order:
+```.py
 CREATE TABLE order_items (  
     id INTEGER PRIMARY KEY AUTOINCREMENT,  
     order_id INTEGER,  
@@ -175,15 +177,15 @@ CREATE TABLE order_items (
     FOREIGN KEY (order_id) REFERENCES orders(id)  
 );    
 ```
-Here the `order_id` foreign key ensures that items are linked to valid orders and it creates relational integrity with the table `orders`. Fourth, `tables` table manages table statuses (for ex: available, occupied):
-```.sql
+Here the `order_id` foreign key makes sure that items are linked to valid orders and it creates relational integrity with the table `orders`. Fourth, `tables` table manages table statuses (for ex: available, occupied):
+```.py
 CREATE TABLE tables (  
     id INTEGER PRIMARY KEY,  
     status TEXT DEFAULT 'Available'  
 );  
 ```
-Here the status column helps track which tables are in use, and it so important for **#SC3** (order tracking for admins).Initially, I forgot to enable foreign key support, which made `order_id` values  invalid in `order_items` table. I fixed this by adding `PRAGMA foreign_keys=ON` to the connection setup.
-For security, I implemented password hashing by  `the secure_password` module, which provides two functions: `encrypt_password` and `check_hash2`. During registration, the user’s password is hashed using SHA-256 with a unique hash and it is stored in the `users` table as a hash. During login, the input password is compared to the stored hash using check_hash2, which extracts the hash from `users` table, re-hashes it, and compares the result. I chose SHA-256 over weaker algorithms like MD5 because it is collision-resistant and recommended by OWASP[^9] for password storage. Initially, I stored passwords as how they are during testing, but after I realized the security risk, then I switched to hashing and updated the database schema. Example of hashing during registration: 
+Here the status column comes in handy to monitor which tables are being used, and is therefore so important to **#SC3** (admin order tracing). I accidentally forgot to enable foreign key support initially, and as a result, `order_id` fields in `order_items` table became invalid. I solved it by including `PRAGMA foreign_keys=ON` in the connection setup.
+I used password hashing by `secure_password` module and its two methods: `encrypt_password` and `check_hash2`. When the user registers, the user's password is hashed by SHA-256 to a unique hash and is stored in `users` table as a hash. When logging in, the input password is compared to the stored hash by using check_hash2, which fetches the hash from `users` table, hashes it again, and compares the result. I used SHA-256 instead of less secure options like MD5 as it is collision-resistant and recommended by OWASP[^9] to store passwords. I used to store passwords as is during testing, but as soon as I knew about the security issue, I switched to hashing and modified the schema of the database. Example of hashing during registration:
 ```.py
 password_hash = encrypt_password(password1)   
 db.run_save(f"INSERT INTO users VALUES ('{username}', '{password_hash}')")  
@@ -195,7 +197,7 @@ if user_info and check_hash2(password, user_info[2]):
     print("Login successful!")  
 ```
 
-### 2.  - #SC4: OOP Paradigm - #SC1, #SC2, #SC3, #SC4, #SC5 100 words
+### 2.  *OOP Paradigm *-** #SC1, #SC2, #SC3, #SC4, #SC5** 
 OOP paradigm is one of the focuses of this project and `OrderedItem` class was the best example of how I applied OOP priniciples to this project. The `OrderedItem ` class *encapsulates* all details of item , including everything. This is how it was defined:
 ```.py
 class OrderedItem:
@@ -214,7 +216,7 @@ Here we can see that all details of item is initialized. This *encapsulation* ma
     def __str__(self):
         return f"{self.name} x{self.quantity} - {self.price}¥ = {self.total}¥"
 ```
-### 3 Use of Dropdown Menu - #SC1 110 words
+### 3 *Use of Dropdown Menu* - **#SC1**
 In the registration section, specifically in `RegisterScreen`, users have to choose their role for the appropirate direction to the screens based on their roles **#SC1**. For me the best way to do this was to use `KivyMD`s `MDDropdownMenu` , which would include two choices of role: Waiter and Administrator. These menu items are generated using `OneLineListItem`:
 ```.py
     def create_role_menu(self, input_menu):
@@ -246,7 +248,7 @@ Here `caller` binds the menu to dropdown button in kv file and `items` are basic
 ```
 But initially, the position of menu was not correct, so I binded the menu to the button using `caller`.
 
-### 4. Use of Data Table - #SC1 140 words
+### 4. *Use of Data Table* - **#SC3** 
 To address the **#SC3** I used `KivyMD`'s `MDDataTable` , specially for the part of  **#SC3**, which requires general control over the ongoing orders. So I assigned a new screen and class for this data table: `Ongoing_Orders`. I initialized the components of the table in the `on_pre_enter`, here they are: `Table Number`, `Start Time`, `Order ID`. I also allowed `pagination`, which needed for handling big data,  in case this application will be used for much more busier restaurants in the future. `checkbox`es are the main  factor for controlling the orders by the admin. 
 ```.py
 def on_pre_enter(self,*args):
@@ -262,7 +264,7 @@ def on_pre_enter(self,*args):
 ```
 Here using this data table, administrators can select orders using checkboxes and by the help of `cancel_selected_orders` and `finish_selected_orders` functions, they can update the status of table, which makes automated changes in the database. This implementation of `MDDataTable` helped me to efficiently fulfill the requirements of **#SC3**.  
 
-### 5. Use of Properties instead of regular variables - #SC1 85 words
+### 5. *Use of Properties instead of regular variables* - **#SC2, #SC3, #SC5**
 I used `Kivy`'s `Properties` (for example `StringProperty`, `ListProperty`, `ObjectProperty` and etc) in especially table screens where I mostly need to deal with the components of the ui for fully functionality. For example:
 ```.py
 class Table_Waiter(MDScreen):
@@ -314,8 +316,8 @@ self.quantity_dialog.content_cls.food_name=food_name
 self.quantity_dialog.content_cls.food_price=food_price
 ```
 
-### 7. *Threading method, batch update, and fixing pragma modes* - **#SC2**  190 words
-Back then, in the `Table_Waiter` screen, as test user, when I was doing multiple transactions, such as adding a new order, printing the bill, or inputting the quantity in the dialog and etc., I was facing a major challenge where screen was freezing after pressing the button to the relevant transaction and I was getting the error- "database is locked". And when I was deeply looking for the reason, I found out that database operations can be enough time-consuming that can be get locked for other operation, which reduces the user experience. I researched for the solution and found about Threading method which was the best solution to my problem as it offloads database updates to a thread working in the background and makes the UI stay responsive during updates. I implemented it in `process_order `function in the `Table_Waiter` class, where most of database updates and validations are happening. The most important part of this function is to use `threading` for the function `batch_update_db`:
+### 7. *Threading method, batch update, and fixing pragma modes* - **#SC2** 
+Back then, in the `Table_Waiter` screen, as test user, when I was doing multiple transactions, such as adding a new order, printing the bill, or inputting the quantity in the dialog and etc., I was facing a major challenge where screen was freezing after pressing the button to the relevant transaction and I was getting the error- "database is locked". And when I was deeply looking for the reason, I found out that database operations can be enough time-consuming that can be get locked for other operation, which reduces the user experience. I researched for the solution and found about Threading [^12] method which was the best solution to my problem as it offloads database updates to a thread working in the background and makes the UI stay responsive during updates. I implemented it in `process_order `function in the `Table_Waiter` class, where most of database updates and validations are happening. The most important part of this function is to use `threading` for the function `batch_update_db`:
 ```.py
 threading.Thread(target=self.batch_update_db).start()  
 ```
@@ -339,6 +341,8 @@ def update_graphics(self,*args):
     self.bg_ellipse.pos=(self.x,self.y)  
     self.bg_ellipse.size=(self.width,self.height)  
 ```
+
+
 
 # Criteria D: Functionality
 
