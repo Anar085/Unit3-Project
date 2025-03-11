@@ -571,3 +571,20 @@ class Table_Waiter(MDScreen):
             buttons=[MDFlatButton(text="CLOSE",on_release=lambda x: dialog.dismiss())],
         )
         dialog.open()
+
+#admin available screen
+class Table_Admin_Available(MDScreen):
+    selected_table_admin=StringProperty("")
+    current_status=StringProperty("Available")
+    def on_enter(self):
+        self.selected_table_admin=self.manager.selected_table_admin
+        self.load_table_status()
+
+    def load_table_status(self):
+        db=Database_Manager('pos.db')
+        result=db.search_one(f"SELECT status FROM tables WHERE id='{self.selected_table_admin}'")
+        if result and result[0]:
+            self.current_status=result[0]
+        else:
+            self.current_status='Available'
+        db.close()
