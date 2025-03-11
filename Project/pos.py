@@ -799,3 +799,63 @@ class Ongoing_Orders(MDScreen):
     def show_toast(self, message):
         app = MDApp.get_running_app()
         app.show_toast(message)
+
+#main app 
+class pos(MDApp):
+    db=Database_Manager('pos.db')
+    def build(self):
+        self.init_databases()
+    def init_databases(self):
+        with DatabaseManager('pos.db') as db:
+            db.execute("""
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY,
+                    username TEXT UNIQUE,
+                    password TEXT,
+                    role TEXT DEFAULT 'waiter'
+                )""")
+        with DatabaseManager('pos.db') as db:
+            db.execute("""
+                CREATE TABLE IF NOT EXISTS menu (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT UNIQUE,
+                    category TEXT,
+                    price REAL
+                )""")
+            db.execute('''
+            CREATE TABLE IF NOT EXISTS orders (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                table_id INTEGER,
+                waiter TEXT,
+                items TEXT,
+                total REAL,
+                status TEXT,
+                timestamp DATETIME
+            )
+            ''')
+            db.execute('''
+            CREATE TABLE IF NOT EXISTS order_items (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                order_id INTEGER,
+                food_name TEXT,
+                price INTEGER,
+                quantity INTEGER,
+                FOREIGN KEY (order_id) REFERENCES orders (id)
+            )
+            ''')
+            db.execute('''
+                    CREATE TABLE IF NOT EXISTS tables (
+                        id INTEGER PRIMARY KEY,
+                        status TEXT DEFAULT 'Available'
+                    )
+                ''')
+            # Populate tables 1-37
+            for i in range(1, 38):
+                if not db.fetch_one(f"SELECT 1 FROM tables WHERE id={i}"):
+                    db.execute(f"INSERT INTO tables (id) VALUES ({i})")
+    def on_stop(self):
+        db=Database_Manager('pos.db')
+        db.close()
+    def show_toast(self, message):
+        toast(message)
+pos().run()
