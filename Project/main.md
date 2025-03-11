@@ -85,7 +85,9 @@
 
 ## Test Plan
 
-## Record of Tasks| Task No | Planned Action                                                                                         | Planned Outcome                                                                                                | Time Estimate | Target Completion Date | Criterion |
+## Record of Tasks
+
+| Task No | Planned Action                                                                                         | Planned Outcome                                                                                                | Time Estimate | Target Completion Date | Criterion |
 |---------|--------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|---------------|------------------------|-----------|
 | 1       | Write problem definition                                                                               | Meet with client and finalize a description of the problem.                                                    | 30 min        | February 24            | A         |
 | 2       | Suggest and finalize success criteria                                                                  | Meet with client and agree on success criteria for the POS solution.                                           | 30 min        | February 25            | A         |
