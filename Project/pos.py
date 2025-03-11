@@ -11,7 +11,7 @@ from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.screen import MDScreen
 from secure_password import encrypt_password, check_hash2
 from kivymd.uix.list import  OneLineIconListItem
-from my_lib import Database_Manager
+from my_lib import Database_Manager, DatabaseManager
 from kivy.uix.widget import Widget
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.properties import *
