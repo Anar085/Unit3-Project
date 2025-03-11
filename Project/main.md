@@ -119,13 +119,14 @@
 
 ## Data storing method
 
-
-
-
-
 ![image](https://github.com/user-attachments/assets/c9c5a570-bb1c-4e8b-b7a0-45902964fd75)
 
 **Fig 8** *This extract is an example how the data is stored -**SQL Database***
+(Inconsistencies in ids are due to ***Canceled*** orders)
+
+![image](https://github.com/user-attachments/assets/69ee158b-fdc3-485a-85fa-9ad500a21b25)
+
+**Fig 9** *This extract is an example how the sensitive data such as passwords or users are stored as a **hash** for improved security*
 (Inconsistencies in ids are due to ***Canceled*** orders)
 
 # Criteria C: Development
