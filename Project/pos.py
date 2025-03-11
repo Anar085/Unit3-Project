@@ -193,3 +193,72 @@ class CustomRectButton(ButtonBehavior,Widget):
         self.label.center=(self.x+self.width/2,self.y+self.height/2)
     def on_press(self):
         print(f"Rectangular table button's text:{self.text}")
+
+class CustomCircleButton(ButtonBehavior,Widget):
+    text=StringProperty("Button")
+    fill_color=ListProperty([0.8,0.8,0.8,1])
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+        with self.canvas.before:
+            self.bg_color=Color(*self.fill_color)
+            self.bg_ellipse=Ellipse()
+            self.tab_top=Rectangle()
+            self.tab_bottom=Rectangle()
+            self.tab_left=Rectangle()
+            self.tab_right=Rectangle()
+            self.line_color=Color(0,0,0,1)
+            self.line_ellipse=Line()
+            self.line_top=Line()
+            self.line_bottom=Line()
+            self.line_left=Line()
+            self.line_right=Line()
+        self.label=Label(text=self.text,font_size=30,color=(0,0,0,1),size_hint=(None,None))
+        self.add_widget(self.label)
+        self.bind(pos=self.update_graphics,size=self.update_graphics,text=self.update_text)
+        
+    def update_text(self,*args):
+        self.label.text=self.text
+        self.label.texture_update()
+        self.label.size=self.label.texture_size
+    def update_graphics(self,*args):
+        #button body dimesions
+        circle_diam=80
+        circle_x=self.x+(self.width-circle_diam)/2
+        circle_y=self.y+(self.height-circle_diam)/2
+    
+        #four rectangular chairs
+        tab_w,tab_h=20,20
+        top_x=self.x+(self.width-tab_w)/2
+        top_y=circle_y+circle_diam
+        bottom_x=top_x
+        bottom_y=circle_y-tab_h
+        left_x=circle_x-tab_w
+        left_y=self.y+(self.height-tab_h)/2
+        right_x=circle_x+circle_diam
+        right_y=left_y
+        
+        #place ellipse and chairs correctly
+        self.bg_color.rgba=self.fill_color
+        self.bg_ellipse.pos=(circle_x,circle_y)
+        self.bg_ellipse.size=(circle_diam,circle_diam)
+        self.tab_top.pos=(top_x,top_y)
+        self.tab_top.size=(tab_w,tab_h)
+        self.tab_bottom.pos=(bottom_x,bottom_y)
+        self.tab_bottom.size=(tab_w,tab_h)
+        self.tab_left.pos=(left_x,left_y)
+        self.tab_left.size=(tab_w,tab_h)
+        self.tab_right.pos=(right_x,right_y)
+        self.tab_right.size=(tab_w,tab_h)
+        
+        #outlines
+        self.line_ellipse.ellipse=(circle_x,circle_y,circle_diam,circle_diam)
+        self.line_top.rectangle=(top_x,top_y,tab_w,tab_h)
+        self.line_bottom.rectangle=(bottom_x,bottom_y,tab_w,tab_h)
+        self.line_left.rectangle=(left_x,left_y,tab_w,tab_h)
+        self.line_right.rectangle=(right_x,right_y,tab_w,tab_h)
+        #put label to center
+        self.label.texture_update()
+        self.label.size=self.label.texture_size
+        self.label.center=(self.x+self.width/2,self.y+self.height/2)
+    def on_press(self):
+        print(f"Circle button's text:{self.text}")
