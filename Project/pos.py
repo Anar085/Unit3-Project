@@ -713,3 +713,89 @@ class Table_Admin_Available(MDScreen):
         else:
             self.current_status='Available'
         db.close()
+
+#data table for ongoin orders
+class Ongoing_Orders(MDScreen):
+    def __init__(self,*args, **kwargs):
+        super().__init__(*args,**kwargs)
+        self.data_table=None
+        self.selected_rows=[]
+    def on_pre_enter(self,*args):
+        column_names=[('Table Number', 100),('Waiter', 100),('Start time', 100),('Order ID', 100)]
+        self.data_table=MDDataTable(
+            size_hint=(.8,.5),
+            pos_hint={'center_x': .5, 'top': .8},
+            use_pagination=True,
+            check=True,
+            column_data=column_names,
+            rows_num=6
+        )
+        self.data_table.bind(on_row_press=self.row_pressed)
+        self.data_table.bind(on_check_press=self.checkbox_pressed)
+        self.add_widget(self.data_table)
+        buttons_layout = MDBoxLayout(
+            orientation='horizontal',
+            size_hint=(0.8,0.1),
+            pos_hint={'center_x': 0.5, 'top': 0.3},
+            spacing="10dp"
+        )
+        cancel=MDRaisedButton(
+            text="Cancel Order",
+            pos_hint_x=0.3,
+            theme_text_color="Custom",
+            text_color="black",
+            md_bg_color=(0.9,0.9,0.9,1),
+            on_release=self.cancel_selected_orders
+        )
+        finish=MDRaisedButton(
+            text="Finish Order",
+            pos_hint_x=0.5,
+            theme_text_color="Custom",
+            text_color="black",
+            md_bg_color=(0.9, 0.9, 0.9, 1),
+            on_release=self.finish_selected_orders,
+        )
+        buttons_layout.add_widget(cancel)
+        buttons_layout.add_widget(finish)
+        self.add_widget(buttons_layout)
+        self.update()
+
+    def update(self):
+        data = pos.db.search_all("""SELECT t.id, o.waiter, o.timestamp, o.id FROM orders o JOIN tables t ON o.table_id = t.id WHERE o.status="Ongoing"""")
+        self.data_table.update_row_data(None,data)
+    def row_pressed(self, table, cell):
+        print(f"Cell pressed:{cell.text}")
+    def checkbox_pressed(self, table, row_data):
+        self.selected_rows.append(row_data)
+    def cancel_selected_orders(self,instance=None):
+        if not self.selected_rows:
+            self.show_toast("No orders selected")
+            return
+        db=Database_Manager('pos.db')
+        for row in self.selected_rows:
+            print(row)
+            table_id=row[0]
+            order_id=row[3]  
+            db.run_save(f"DELETE FROM order_items WHERE order_id={order_id}")
+            db.run_save(f"DELETE FROM orders WHERE id={order_id}")
+            db.run_save(f"UPDATE tables SET status='Available' WHERE id='{table_id}'")
+        self.show_toast(f"Order(s) canceled successfully")
+        db.close()
+        self.update()  
+
+    def finish_selected_orders(self,instance=None):
+        if not self.selected_rows:
+            self.show_toast("No orders selected")
+            return
+        db=Database_Manager('pos.db')
+        for row in self.selected_rows:
+            table_id=row[0]
+            order_id=row[3]  
+            db.run_save(f"UPDATE orders SET status='Finished' WHERE id={order_id}")
+            db.run_save(f"UPDATE tables SET status='Available' WHERE id='{table_id}'")
+        self.show_toast(f"Order(s) finished successfully") 
+        db.close()
+        self.update()  
+    def show_toast(self, message):
+        app = MDApp.get_running_app()
+        app.show_toast(message)
