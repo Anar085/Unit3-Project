@@ -142,7 +142,7 @@
 8. *Threading method, batch update, and fixing pragma modes* - **#SC2** 150 words
 9. *Customization of Buttons* - **#SC5** 200 words
 
-### 1. SQL Database usage and Password hashing - #SC4:
+### 1. SQL Database usage and Password hashing - #SC4: 170 words
 To address the first part of **#SC4**, I used SQLite because it is lightweight, file-based, and it does not require a separate server, and it is ideal data storing method for a POS system. Then I started by designing the database schema to meet the project’s requirements. The schema includes four main tables : `users`, `orders`, `order_items`, and `tables`. I wrote a Python function to initialize the database and create the tables if they do not already exist. First, `users` table stores user credentials and roles:
 ```.sql
 CREATE TABLE users (  
@@ -195,7 +195,7 @@ if user_info and check_hash2(password, user_info[2]):
     print("Login successful!")  
 ```
 
-### 2.  - #SC4: OOP Paradigm - #SC1, #SC2, #SC3, #SC4, #SC5 50 words
+### 2.  - #SC4: OOP Paradigm - #SC1, #SC2, #SC3, #SC4, #SC5 100 words
 OOP paradigm is one of the focuses of this project and `OrderedItem` class was the best example of how I applied OOP priniciples to this project. The `OrderedItem ` class *encapsulates* all details of item , including everything. This is how it was defined:
 ```.py
 class OrderedItem:
@@ -214,7 +214,7 @@ Here we can see that all details of item is initialized. This *encapsulation* ma
     def __str__(self):
         return f"{self.name} x{self.quantity} - {self.price}¥ = {self.total}¥"
 ```
-### 3 Use of Dropdown Menu - #SC1 100 words
+### 3 Use of Dropdown Menu - #SC1 110 words
 In the registration section, specifically in `RegisterScreen`, users have to choose their role for the appropirate direction to the screens based on their roles **#SC1**. For me the best way to do this was to use `KivyMD`s `MDDropdownMenu` , which would include two choices of role: Waiter and Administrator. These menu items are generated using `OneLineListItem`:
 ```.py
     def create_role_menu(self, input_menu):
@@ -245,6 +245,35 @@ Here `caller` binds the menu to dropdown button in kv file and `items` are basic
         self.role_menu.dismiss()
 ```
 But initially, the position of menu was not correct, so I binded the menu to the button using `caller`.
+
+### 4. Use of Data Table - #SC1 140 words
+To address the **#SC3** I used `KivyMD`'s `MDDataTable` , specially for the part of  **#SC3**, which requires general control over the ongoing orders. So I assigned a new screen and class for this data table: `Ongoing_Orders`. I initialized the components of the table in the `on_pre_enter`, here they are: `Table Number`, `Start Time`, `Order ID`. I also allowed `pagination`, which needed for handling big data,  in case this application will be used for much more busier restaurants in the future. `checkbox`es are the main  factor for controlling the orders by the admin. 
+```.py
+def on_pre_enter(self,*args):
+    column_names=[('Table Number', 100),('Waiter', 100),('Start time', 100),('Order ID', 100)]
+    self.data_table=MDDataTable(
+        size_hint=(.8,.5),
+        pos_hint={'center_x': .5, 'top': .8},
+        use_pagination=True,
+        check=True,
+        column_data=column_names,
+        rows_num=6
+    )
+```
+Here using this data table, administrators can select orders using checkboxes and by the help of `cancel_selected_orders` and `finish_selected_orders` functions, they can update the status of table, which makes automated changes in the database. This implementation of `MDDataTable` helped me to efficiently fulfill the requirements of **#SC3**.  
+
+### 5. Use of Properties instead of regular variables - #SC1  words
+I used `Kivy`'s `Properties` (for example `StringProperty`, `ListProperty`, `ObjectProperty` and etc) in especially table screens where I mostly need to deal with the components of the ui for fully functionality. For example:
+```.py
+class Table_Waiter(MDScreen):
+    selected_table=StringProperty("")
+    order_items=ListProperty([])
+    quantity_dialog=ObjectProperty(None)
+    current_food=StringProperty("")
+    current_price=StringProperty("")
+    order_id=NumericProperty(0)
+```
+I came up with this technique after research in web kivy documentation [^10]. They are the most efficient way to work with ui back end logic, and they eliminate the need for manual UI refresh all the time, which is very important factor for screens like `Table_Waiter` as they need more maintainable variables.   
 
 
 # Criteria D: Functionality
