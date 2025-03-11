@@ -127,7 +127,6 @@
 ![image](https://github.com/user-attachments/assets/69ee158b-fdc3-485a-85fa-9ad500a21b25)
 
 **Fig 9** *This extract is an example how the sensitive data such as passwords or users are stored as a **hash** for improved security*
-(Inconsistencies in ids are due to ***Canceled*** orders)
 
 # Criteria C: Development
 
