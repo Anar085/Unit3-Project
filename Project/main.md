@@ -132,6 +132,16 @@
 
 ## List of techniques used
 
+1. *SQL Database usage and Password hashing* - **#SC4**
+2. *OOP Paradigm* - **#SC1, #SC2, #SC3, #SC4, #SC5**
+3. *Use of Dropdown Menu* - **#SC1**
+4. *Use of Data Table* - **#SC3**
+5. *Use of Properties instead of regular variables* - **#SC2, #SC3, #SC5**
+6. *Use of OneLineListItem* - **#SC2**
+7. *Use of MD Dialog* - **#SC2**
+8. *Threading method, batch update, and fixing pragma modes* - **#SC2**
+9. *Customization of Buttons* - **#SC5**
+
 
 
 
