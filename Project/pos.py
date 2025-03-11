@@ -127,6 +127,7 @@ class RegisterScreen(MDScreen):
         self.ids.password_reg.error=False
         self.ids.password_check_reg.error=False
 
+# custom buttons
 class CustomRectButton(ButtonBehavior,Widget):
     text=StringProperty("Button")
     fill_color=ListProperty([0.8,0.8,0.8,1])
