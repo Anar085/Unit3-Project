@@ -314,6 +314,31 @@ self.quantity_dialog.content_cls.food_name=food_name
 self.quantity_dialog.content_cls.food_price=food_price
 ```
 
+### 7. *Threading method, batch update, and fixing pragma modes* - **#SC2**  190 words
+Back then, in the `Table_Waiter` screen, as test user, when I was doing multiple transactions, such as adding a new order, printing the bill, or inputting the quantity in the dialog and etc., I was facing a major challenge where screen was freezing after pressing the button to the relevant transaction and I was getting the error- "database is locked". And when I was deeply looking for the reason, I found out that database operations can be enough time-consuming that can be get locked for other operation, which reduces the user experience. I researched for the solution and found about Threading method which was the best solution to my problem as it offloads database updates to a thread working in the background and makes the UI stay responsive during updates. I implemented it in `process_order `function in the `Table_Waiter` class, where most of database updates and validations are happening. The most important part of this function is to use `threading` for the function `batch_update_db`:
+```.py
+threading.Thread(target=self.batch_update_db).start()  
+```
+`batch_update_db` function updates the items list in `order_items`. By uploading this to a background thread, ui remains responsive and does not get freeze.
+
+### 8. *Customization of Buttons* - **#SC5** 
+To address **#SC5** I had to find the best way to mimic the restaurant's actual map in my pos system. For this I decided to customize the table buttons based on the shape they have in reality: rectangular and circular. To match app with real ones I created the classes `CustomRectButton` and `CustomCircleButton`. They are inheriting from Kivy's `ButtonBehavior` and `Widget` classes to customly draw the tables using Kivy's `canvas` instructions. For example, the CustomCircleButton class draws a circle and tabs using `Ellipse` and `Rectangle` to represent the round table with 4 chairs:
+```.py
+class CustomCircleButton(ButtonBehavior,Widget):  
+    def __init__(self,**kwargs):  
+        super().__init__(**kwargs)  
+        with self.canvas.before:  
+            self.bg_color=Color(0.8,0.8,0.8,1)
+            self.bg_ellipse=Ellipse(pos=self.pos,size=self.size)  
+            self.tab_top=Rectangle(pos=(self.x+40,self.y+80),size=(20,20))  
+
+```
+The function `update_graphics` is making sure that if user changes button's size and position, shapes are drawn again based on new position and size:
+```.py
+def update_graphics(self,*args):  
+    self.bg_ellipse.pos=(self.x,self.y)  
+    self.bg_ellipse.size=(self.width,self.height)  
+```
 
 # Criteria D: Functionality
 
