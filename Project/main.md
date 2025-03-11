@@ -214,8 +214,37 @@ Here we can see that all details of item is initialized. This *encapsulation* ma
     def __str__(self):
         return f"{self.name} x{self.quantity} - {self.price}¥ = {self.total}¥"
 ```
+### 3 Use of Dropdown Menu - #SC1 100 words
+In the registration section, specifically in `RegisterScreen`, users have to choose their role for the appropirate direction to the screens based on their roles **#SC1**. For me the best way to do this was to use `KivyMD`s `MDDropdownMenu` , which would include two choices of role: Waiter and Administrator. These menu items are generated using `OneLineListItem`:
+```.py
+    def create_role_menu(self, input_menu):
+        role_items=[
+            {"text":"Administrator"},
+            {"text":"Waiter"}
+        ]
+        role_list=[]
+        for item in role_items:
+            role_dict={
+                "text":item["text"],
+                "viewclass":"OneLineListItem",
+                "on_release":lambda x=item["text"]:self.button_pressed(x)
+            }
+            role_list.append(role_dict)
 
-
+        self.role_menu=MDDropdownMenu(
+            caller=input_menu,
+            items=role_list,
+            width_mult=3
+        )
+        self.role_menu.open()
+```
+Here `caller` binds the menu to dropdown button in kv file and `items` are basically the list of roles. Then to update the text of button and dissmiss the dropdown menu I created `button_pressed` function:
+```.py
+    def button_pressed(self,role):
+        self.ids.dropdown_reg.text=f"{role}"
+        self.role_menu.dismiss()
+```
+But initially, the position of menu was not correct, so I binded the menu to the button using `caller`.
 
 
 # Criteria D: Functionality
