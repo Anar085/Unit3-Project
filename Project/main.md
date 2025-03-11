@@ -262,7 +262,7 @@ def on_pre_enter(self,*args):
 ```
 Here using this data table, administrators can select orders using checkboxes and by the help of `cancel_selected_orders` and `finish_selected_orders` functions, they can update the status of table, which makes automated changes in the database. This implementation of `MDDataTable` helped me to efficiently fulfill the requirements of **#SC3**.  
 
-### 5. Use of Properties instead of regular variables - #SC1  words
+### 5. Use of Properties instead of regular variables - #SC1 85 words
 I used `Kivy`'s `Properties` (for example `StringProperty`, `ListProperty`, `ObjectProperty` and etc) in especially table screens where I mostly need to deal with the components of the ui for fully functionality. For example:
 ```.py
 class Table_Waiter(MDScreen):
@@ -274,6 +274,45 @@ class Table_Waiter(MDScreen):
     order_id=NumericProperty(0)
 ```
 I came up with this technique after research in web kivy documentation [^10]. They are the most efficient way to work with ui back end logic, and they eliminate the need for manual UI refresh all the time, which is very important factor for screens like `Table_Waiter` as they need more maintainable variables.   
+
+### 6. *Use of MD Dialog* - **#SC2** 170 words
+In the `Table_Waiter` screen, there had to be the section for waiters to add the quantity of the item they selected. For this section I had to make sure that waiter's attention will be focused on the entering quantity for minimizing the distractions and the section had to be reusable for every item in the menu for better optimization. After research on kivy documentation[^11], I decided I have to use `KivyMD`'s `MDDialog` and `QuantityDialog` layout. For implementing it in the `Table_Waiter` class I created `show_quantity_dialog`. This dialog requires waiters to input the needed quantity of food that is also displayed on the dialog.
+```.py
+def show_quantity_dialog(self,food_name,food_price):
+    if not self.quantity_dialog:
+        content=QuantityDialog(food_name=food_name, food_price=food_price)
+        self.quantity_dialog=MDDialog(
+            title="Enter Quantity",
+            type="custom",
+            content_cls=content,
+            buttons=[
+                MDFlatButton(text="CANCEL", on_release=self.dismiss_dialog),
+                MDFlatButton(text="ORDER", on_release=lambda x: self.process_order(content)),
+            ],
+        )
+```
+First function makes sure dialog exists, if not it creates one with the custom layout `QuantityDialog` and two buttons `CANCEL` and `ORDER`. `CANCEL` button is basically dismisses the dialog, while `ORDER` button initializes the functino called `process_order`:
+```.py
+class QuantityDialog(MDBoxLayout):
+    food_name=StringProperty("")
+    food_price=StringProperty("")
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+        self.ids.quantity_input.text="1"
+    def validate_quantity(self):
+        try:
+            quantity=int(self.ids.quantity_input.text)
+            if quantity<=0:
+                return False,"Quantity must be positive"
+            return True,quantity
+        except ValueError:
+            return False,"Quantity must be a number"
+```
+The class `QuantityDialog` has a `MDTextField` for the inputs of quantity. If the dialog exists, then function is updating the content on it with the newly selected item:
+```.py
+self.quantity_dialog.content_cls.food_name=food_name
+self.quantity_dialog.content_cls.food_price=food_price
+```
 
 
 # Criteria D: Functionality
