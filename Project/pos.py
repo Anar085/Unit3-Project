@@ -352,3 +352,222 @@ class Admin_Terrace(MDScreen):
         elif status=="Occupied":
             self.manager.current="Table_Admin_Occupied"
         db.close()
+
+# waiter table screen
+class Table_Waiter(MDScreen):
+    selected_table=StringProperty("")
+    order_items=ListProperty([])
+    quantity_dialog=ObjectProperty(None)
+    current_food=StringProperty("")
+    current_price=StringProperty("")
+    order_id=NumericProperty(0)
+    def on_enter(self):
+        self.selected_table=self.manager.selected_table
+        self.load_ongoing_order()
+        if self.order_items:
+            self.update_table_status("Occupied")
+        self.update_ordered_items_display()
+        self.update_price_summary()
+    def connect_db(self):
+        conn=sqlite3.connect('pos.db',timeout=10)
+        conn.execute('PRAGMA journal_mode=WAL')
+        conn.execute('PRAGMA foreign_keys=ON')
+        return conn
+
+    def update_table_status(self,status):
+        conn=self.connect_db()
+        cursor=conn.cursor()
+        query="UPDATE tables SET status=? WHERE id=?"
+        cursor.execute(query,(status,self.selected_table))
+        conn.commit()
+        conn.close()
+        print(f"Table {self.selected_table} status - {status}")
+    def load_ongoing_order(self):
+        self.order_items=[]
+        self.order_id=0
+        conn=self.connect_db()
+        cursor=conn.cursor()
+        query1='''SELECT id, items FROM orders WHERE table_id=? AND status='Ongoing' ORDER BY timestamp DESC LIMIT 1'''
+        cursor.execute(query1,(self.selected_table,))
+        result=cursor.fetchone()
+        if result:
+            self.order_id=result[0]
+            items_str=result[1]
+            query2='''SELECT id, food_name, price, quantity FROM order_items WHERE order_id=?'''
+            cursor.execute(query2,(self.order_id,))
+            items_result=cursor.fetchall()
+            if items_result:
+                for item in items_result:
+                    item_id,name,price,quantity=item
+                    self.order_items.append(OrderedItem(name,price,quantity,item_id))
+            elif items_str:
+                items=items_str.split("; ")
+                for item_str in items:
+                    if " x" in item_str and " - " in item_str:
+                        name=item_str.split(" x")[0]
+                        quantity=int(item_str.split(" x")[1].split(" - ")[0])
+                        price=int(item_str.split(" - ")[1].split("¥")[0])
+                        self.order_items.append(OrderedItem(name,price,quantity))
+        conn.close()
+
+    def add_to_order(self, food_text):
+        parts=food_text.split(" - ")
+        food_name=parts[0]
+        food_price=parts[1]
+        self.current_food=food_name
+        self.current_price=food_price
+        self.ids.food_overview_label.text=f"Selected: {food_name}\nPrice: {food_price}"
+        self.show_quantity_dialog(food_name,food_price)
+
+    def show_quantity_dialog(self,food_name,food_price):
+        if not self.quantity_dialog:
+            content=QuantityDialog(food_name=food_name, food_price=food_price)
+            self.quantity_dialog=MDDialog(
+                title="Enter Quantity",
+                type="custom",
+                content_cls=content,
+                buttons=[
+                    MDFlatButton(text="CANCEL", on_release=self.dismiss_dialog),
+                    MDFlatButton(text="ORDER", on_release=lambda x: self.process_order(content)),
+                ],
+            )
+        else:
+            self.quantity_dialog.content_cls.food_name=food_name
+            self.quantity_dialog.content_cls.food_price=food_price
+        self.quantity_dialog.open()
+        
+    def dismiss_dialog(self,*args):
+        if self.quantity_dialog:
+            self.quantity_dialog.dismiss()
+            
+    def process_order(self, content):
+        valid,result=content.validate_quantity()
+        if not valid:
+            content.ids.error_label.text=result
+            return
+        quantity=result
+        ordered_item=OrderedItem(content.food_name,content.food_price,quantity)
+        if self.order_id==0:
+            self.create_new_order()
+            self.update_table_status("Occupied")
+        self.order_items.append(ordered_item)
+        self.update_ordered_items_display()
+        self.update_price_summary()
+        # batch update to database
+        threading.Thread(target=self.batch_update_db).start()
+        self.dismiss_dialog()
+        self.ids.food_overview_label.text = "Food selected will appear here"
+
+    def create_new_order(self):        
+        db=Database_Manager
+        conn=self.connect_db()
+        cursor=conn.cursor()
+        waiter_name=LoginScreen.current_user
+        table_id=int(self.selected_table)
+        cursor.execute(f'''
+        INSERT INTO orders (table_id, waiter, items, total, status, timestamp)
+        VALUES ('{table_id}', '{waiter_name}',"", 0, "Ongoing", '{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}')
+        ''')
+        self.order_id=cursor.lastrowid
+        conn.commit()
+        conn.close()
+        
+    def batch_update_db(self):
+        conn=self.connect_db()
+        cursor=conn.cursor()
+        cursor.execute("PRAGMA foreign_keys = ON;")
+        cursor.execute("SELECT id FROM orders WHERE id = ?", (self.order_id,))
+        if cursor.fetchone() is None:
+            raise ValueError(f"Order ID - {self.order_id} is not in orders table")
+        for item in self.order_items:
+            if item.item_id is None:
+                cursor.execute('''
+                INSERT INTO order_items (order_id,food_name,price,quantity) VALUES (?, ?, ?, ?)''', (
+                    self.order_id,
+                    item.name,
+                    item.price,
+                    item.quantity
+                ))
+                item.item_id=cursor.lastrowid
+            else:
+                cursor.execute('''
+                UPDATE order_items SET quantity = ?,price = ? WHERE id = ?''', (
+                    item.quantity,
+                    item.price,
+                    item.item_id
+                ))
+        self.update_order_total_and_items_in_db(cursor)
+        conn.commit()
+        conn.close()
+
+
+    def update_order_total_and_items_in_db(self, cursor):
+        if self.order_id == 0:
+            return
+        subtotal=sum(item.total for item in self.order_items)
+        service_charge=round(subtotal * 0.03)
+        tax = round(subtotal * 0.02)
+        total = subtotal+service_charge + tax
+        items_summary=self.generate_items_summary()
+        query='''UPDATE orders SET total = ?, items = ? WHERE id = ?'''
+        cursor.execute(query,(total,items_summary,self.order_id))
+        verification_query="SELECT total, items FROM orders WHERE id = ?"
+        cursor.execute(verification_query,(self.order_id,))
+        result=cursor.fetchone()
+        if result:
+            print(f"Updated total: {result[0]}, items: {result[1]}")
+        else:
+            print(f"Order {self.order_id} not found after update")
+
+    def generate_items_summary(self):
+        return "; ".join([str(item) for item in self.order_items])
+
+    def update_ordered_items_display(self):
+        ordered_list=self.ids.ordered_items_list
+        ordered_list.clear_widgets()
+        for item in self.order_items:
+            list_item=OneLineAvatarIconListItem(text=f"{item.name} x{item.quantity} - {item.total}¥")
+            ordered_list.add_widget(list_item)
+
+    def update_price_summary(self):
+        subtotal=sum(item.total for item in self.order_items)
+        service_charge=round(subtotal*0.03)
+        tax=round(subtotal*0.02)
+        total=subtotal+service_charge+tax
+        price_text=(
+            f"Food: {subtotal}¥\n"
+            f"Service Charge (3%): {service_charge}¥\n"
+            f"Tax (2%): {tax}¥\n"
+            f"Total: {total}¥"
+        )
+        self.ids.price_label.text=price_text
+
+    def print_bill(self):
+        if not self.order_items:
+            return
+        bill_text=self.get_bill_text()
+        self.show_bill_dialog(bill_text)
+
+    def get_bill_text(self):
+        subtotal=sum(item.total for item in self.order_items)
+        service_charge=round(subtotal*0.03)
+        tax=round(subtotal*0.02)
+        total=subtotal+service_charge+tax
+        bill=f"=== TABLE {self.selected_table} BILL ===\n"
+        bill+=f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n"
+        bill+="ORDERED ITEMS:\n"
+        for item in self.order_items:
+            bill+=f"{item.name} x{item.quantity} - {item.total}¥\n"
+        bill+=f"\nSubtotal: {subtotal}¥\n"
+        bill+=f"Service Charge (3%): {service_charge}¥\n"
+        bill+=f"Tax (2%): {tax}¥\n"
+        bill+=f"TOTAL: {total}¥\n"
+        return bill
+
+    def show_bill_dialog(self,bill_text):
+        dialog=MDDialog(
+            title="Bill Printed",
+            text=bill_text,
+            buttons=[MDFlatButton(text="CLOSE",on_release=lambda x: dialog.dismiss())],
+        )
+        dialog.open()
