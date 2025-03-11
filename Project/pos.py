@@ -262,3 +262,19 @@ class CustomCircleButton(ButtonBehavior,Widget):
         self.label.center=(self.x+self.width/2,self.y+self.height/2)
     def on_press(self):
         print(f"Circle button's text:{self.text}")
+
+#Dialog
+class QuantityDialog(MDBoxLayout):
+    food_name=StringProperty("")
+    food_price=StringProperty("")
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+        self.ids.quantity_input.text="1"
+    def validate_quantity(self):
+        try:
+            quantity=int(self.ids.quantity_input.text)
+            if quantity<=0:
+                return False,"Quantity must be positive"
+            return True,quantity
+        except ValueError:
+            return False,"Quantity must be a number"
