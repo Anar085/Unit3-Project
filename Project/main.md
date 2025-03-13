@@ -130,70 +130,17 @@
 
 ## List of techniques used
 
-1. *SQL Database usage and Password hashing* - **#SC4** 
-2. *OOP Paradigm* - **#SC1, #SC2, #SC3, #SC4, #SC5** 
-3. *Use of Properties instead of regular variables* - **#SC2, #SC3, #SC5**
-4. *Threading method, batch update, and fixing pragma modes* - **#SC2** 
-5. *Customization of Buttons* - **#SC5**
+1. *OOP Paradigm* - **#SC1, #SC2, #SC3, #SC4, #SC5** 
+2. *Use of Properties instead of regular variables* - **#SC2, #SC3, #SC4, #SC5**
+3. *Threading method, batch update, and fixing pragma modes* - **#SC2, #SC4** 
+4. *Customization of Buttons* - **#SC5**
 
 [^9]: https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
 [^10]: https://kivy.org/doc/stable/api-kivy.properties.html
 [^11]: https://docs.python.org/3/library/threading.html
 
-### 1. *SQL Database usage and Password hashing*- **#SC4**
-To address the first part of **#SC4**, I started designing the database tables that are relevant to project’s success criterions. I have four main tables : `users`, `orders`, `order_items`, and `tables`. I wrote function to initialize the database and create the tables if they do not already exist. First, `users` table is for storing username, password, and roles:
-```.py
-CREATE TABLE users (  
-    id INTEGER PRIMARY KEY,  
-    username TEXT UNIQUE,  
-    password TEXT,  
-    role TEXT DEFAULT 'waiter'  
-); 
-```
-Here the username is in text unique format so that there will be no account with same usernames, and the "role" provides role-based access, which is important for **#SC1**. Second, `orders` table records orders:
-```.py
-CREATE TABLE orders (  
-    id INTEGER PRIMARY KEY AUTOINCREMENT,  
-    table_id INTEGER,  
-    waiter TEXT,  
-    items TEXT,  
-    total REAL,  
-    status TEXT,  
-    timestamp DATETIME  
-);  
-```
-Here the `table_id` links orders to specific tables, and the status is either ongoing or finished. Third, `order_items` table stores individual items in each order:
-```.py
-CREATE TABLE order_items (  
-    id INTEGER PRIMARY KEY AUTOINCREMENT,  
-    order_id INTEGER,  
-    food_name TEXT,  
-    price INTEGER,  
-    quantity INTEGER,  
-    FOREIGN KEY (order_id) REFERENCES orders(id)  
-);    
-```
-Here the `order_id` foreign key makes sure that items are linked to valid orders and it creates relational integrity with the table `orders`. Fourth, `tables` table manages table statuses (for ex: available, occupied):
-```.py
-CREATE TABLE tables (  
-    id INTEGER PRIMARY KEY,  
-    status TEXT DEFAULT 'Available'  
-);  
-```
-Here the status column monitors which tables are being used, and is therefore so important to **#SC3** (admin order tracing). I accidentally forgot to enable foreign key support initially, and as a result, `order_id` fields in `order_items` table became invalid. I solved it by including `PRAGMA foreign_keys=ON` in the connection setup.
-I used password hashing by `secure_password` module and its two methods: `encrypt_password` and `check_hash2`. When the user registers, the user's password is hashed by SHA-256 to a unique hash and is stored in `users` table as a hash. When logging in, the input password is compared to the stored hash by using check_hash2, which fetches the hash from `users` table, hashes it again, and compares the result. I used SHA-256 instead of less secure options like MD5 as it is collision-resistant and recommended by OWASP[^9] to store passwords. I used to store passwords as is during testing, but as soon as I knew about the security issue, I switched to hashing and modified the tables of the database. Example of hashing during registration:
-```.py
-password_hash = encrypt_password(password1)   
-db.run_save(f"INSERT INTO users VALUES ('{username}', '{password_hash}')")  
-```
-Here is another example of hash verification during login:
-```.py
-user_info = db.search_one(f"SELECT * FROM users WHERE username='{username}'")  
-if user_info and check_hash2(password, user_info[2]): 
-    print("Login successful!")  
-```
 
-### 2.  *OOP Paradigm *-** #SC1, #SC2, #SC3, #SC4, #SC5** 
+### 1.  *OOP Paradigm *-** #SC1, #SC2, #SC3, #SC4, #SC5** 
 OOP paradigm is one of the focuses of this project and `OrderedItem` class was the best example of how I applied OOP priniciples to this project. The use of OOP paradigm allowed me to make my code more reusable and optimized and if there will be any extension in the project, just editing the `OrderedItem ` class, which *encapsulates* all details of item , including everything, will allow developers to save time. This is how it was defined:
 ```.py
 class OrderedItem:
@@ -218,9 +165,9 @@ def update_ordered_items_display(self):
     for item in self.order_items:  
         self.ids.ordered_items_list.add_widget(OneLineListItem(text=str(item)))  
 ```
-This where the update to display takes place: first `self.ids.ordered_items_list` represents `id` of `MDList` widget in the Kivy UI, then here `add_widget()` is a Kivy method that adds a child widget to a parent widget, in this case, it is adding a new item to the `MDList` display. And then `OneLineListItem(text=str(item))` creates a new instance of the OneLineListItem class, which is typically from the KivyMD library for a simple list item that displays a single line of text. Then `str(item)` converts the `item` object to a string representation. This means the items in `self.order_items` might be objects of the `OrderedItem` class that I showed above. For this to work properly, the `OrderedItem` class would need to have a `__str__` method to convert objects to strings. In the flow of my application this method is called whenever the ordered items chage, for example when items are added to a ongoing order, to make the UI stay synchronized with the raw data model.
+This where the update to display takes place: first `self.ids.ordered_items_list` represents `id` of `MDList` widget in the Kivy UI, then here `add_widget()` is a Kivy method that adds a child widget to a parent widget, in this case, it is adding a new item to the `MDList` display. And then `OneLineListItem(text=str(item))` creates a new instance of the OneLineListItem class, which is typically from the KivyMD library for a simple list item that displays a single line of text. Then `str(item)` converts the `item` object to a string representation. This also shows that the items in `self.order_items` are objects of the `OrderedItem` class that I showed above. For this to work properly, the `OrderedItem` class need to have a `__str__` method to convert objects to strings. In the flow of my application this method is called whenever the ordered items chage, for example when items are added to a ongoing order, to make the UI stay synchronized with the raw data model.
 
-### 3. *Use of Properties instead of regular variables* - **#SC2, #SC3, #SC5**
+### 2. *Use of Properties instead of regular variables* - **#SC2, #SC3, #SC5**
 I used `Kivy`'s `Properties` (for example `StringProperty`, `ListProperty`, `ObjectProperty` and etc) in especially table screens where I mostly need to deal with the components of the ui for fully functionality. For example:
 ```.py
 class Table_Waiter(MDScreen):
@@ -231,17 +178,17 @@ class Table_Waiter(MDScreen):
     current_price=StringProperty("")
     order_id=NumericProperty(0)
 ```
-I came up with this technique after research in web kivy documentation [^10]. They are the most efficient way to work with ui back end logic, and they eliminate the need for manual UI refresh all the time, which is very important factor for screens like `Table_Waiter` as they need more maintainable variables.   
+I came up with this technique after research in web kivy documentation [^10]. Without `Properties`, I would have needed to write repetitive code to manually refresh the UI every time a variable changed, such as when a new item is added to the order or the selected table was updated, which would lead to a poor extensivibilty. They are the most efficient way to work with ui back end logic, and they eliminate the need for manual UI refresh all the time, which is very important factor for screens like `Table_Waiter` as they need more maintainable variables.   
 
 
-### 4. *Threading method, batch update, and fixing pragma modes* - **#SC2** 
+### 3. *Threading method, batch update, and fixing pragma modes* - **#SC2** 
 Back then, in the `Table_Waiter` screen, as test user, when I was doing multiple transactions, such as adding a new order, printing the bill, or inputting the quantity in the dialog and etc., I was facing a major challenge where screen was freezing after pressing the button to the relevant transaction and I was getting the error- "database is locked". And when I was deeply looking for the reason, I found out that database operations can be enough time-consuming that can be get locked for other operation, which reduces the user experience. I researched for the solution and found about Threading [^11] method which was the best solution to my problem as it offloads database updates to a thread working in the background and makes the UI stay responsive during updates. I implemented it in `process_order `function in the `Table_Waiter` class, where most of database updates and validations are happening. The most important part of this function is to use `threading` for the function `batch_update_db`:
 ```.py
 threading.Thread(target=self.batch_update_db).start()  
 ```
 `batch_update_db` function updates the items list in `order_items`. By uploading this to a background thread, ui remains responsive and does not get freeze.
 
-### 5. *Customization of Buttons* - **#SC5** 
+### 4. *Customization of Buttons* - **#SC5** 
 To address **#SC5** I had to find the best way to mimic the restaurant's actual map in my pos system. For this I decided to customize the table buttons based on the shape they have in reality: rectangular and circular. To match app with real ones I created the classes `CustomRectButton` and `CustomCircleButton`. They are inheriting from Kivy's `ButtonBehavior` and `Widget` classes to customly draw the tables using Kivy's `canvas` instructions. For example, the CustomCircleButton class draws a circle and tabs using `Ellipse` and `Rectangle` to represent the round table with 4 chairs:
 ```.py
 class CustomCircleButton(ButtonBehavior,Widget):  
