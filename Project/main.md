@@ -132,17 +132,13 @@
 
 1. *SQL Database usage and Password hashing* - **#SC4** 
 2. *OOP Paradigm* - **#SC1, #SC2, #SC3, #SC4, #SC5** 
-3. *Use of Dropdown Menu* - **#SC1** 
-4. *Use of Data Table* - **#SC3** 
-5. *Use of Properties instead of regular variables* - **#SC2, #SC3, #SC5**
-6. *Use of MD Dialog* - **#SC2**
-7. *Threading method, batch update, and fixing pragma modes* - **#SC2** 
-8. *Customization of Buttons* - **#SC5**
+3. *Use of Properties instead of regular variables* - **#SC2, #SC3, #SC5**
+4. *Threading method, batch update, and fixing pragma modes* - **#SC2** 
+5. *Customization of Buttons* - **#SC5**
 
 [^9]: https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
 [^10]: https://kivy.org/doc/stable/api-kivy.properties.html
-[^11]: https://kivymd.readthedocs.io/en/latest/components/dialog/
-[^12]: https://docs.python.org/3/library/threading.html
+[^11]: https://docs.python.org/3/library/threading.html
 
 ### 1. *SQL Database usage and Password hashing*- **#SC4**
 To address the first part of **#SC4**, I started designing the database tables that are relevant to project’s success criterions. I have four main tables : `users`, `orders`, `order_items`, and `tables`. I wrote function to initialize the database and create the tables if they do not already exist. First, `users` table is for storing username, password, and roles:
@@ -198,7 +194,7 @@ if user_info and check_hash2(password, user_info[2]):
 ```
 
 ### 2.  *OOP Paradigm *-** #SC1, #SC2, #SC3, #SC4, #SC5** 
-OOP paradigm is one of the focuses of this project and `OrderedItem` class was the best example of how I applied OOP priniciples to this project. The `OrderedItem ` class *encapsulates* all details of item , including everything. This is how it was defined:
+OOP paradigm is one of the focuses of this project and `OrderedItem` class was the best example of how I applied OOP priniciples to this project. The use of OOP paradigm allowed me to make my code more reusable and optimized and if there will be any extension in the project, just editing the `OrderedItem ` class, which *encapsulates* all details of item , including everything, will allow developers to save time. This is how it was defined:
 ```.py
 class OrderedItem:
     def __init__(self,name,price,quantity,item_id=None):
@@ -211,60 +207,20 @@ class OrderedItem:
         self.total=self.price*self.quantity
         self.item_id=item_id
 ```
-Here we can see that all details of item is initialized. This *encapsulation* makes it reusable and inheretable throughout the project as my project is mainly about item order management. Through the use of this class in `Table_Waiter` screen, I made sure that this development is optimized and repetitions are minimized. This class also includes the `_str_` method for providing item's details in a string format for future usage:
+Here we can see that all details of item is initialized. When a new OrderedItem object is created, this method is automatically called to set up the object. There is also a conditional statement `isinstance(price, str)` that checks if `price` parameter is string AND if it contains Japanese Yen `¥` symbol. If both condtions are true it splits the string at the `¥` by using `price.split("¥")` and takes the fisrt part of the result by using `[0]`. Then it gets rid of any spaces with `strip()` and converts it to integer by using `int()`. And this integer then is assigned to the `self.price` for future usage. Overall,  for example, if the price passed from menu is "100¥", this technique will extract numeric value part `100` and assign it to the `self.price` for billing calculations. This *encapsulation* makes it reusable and inheretable throughout the project as my project is mainly about item order management. Through the use of this class in `Table_Waiter` screen, I made sure that this development is optimized and repetitions are minimized. This class also includes the `_str_` method:
 ```.py
     def __str__(self):
         return f"{self.name} x{self.quantity} - {self.price}¥ = {self.total}¥"
 ```
-### 3 *Use of Dropdown Menu* - **#SC1**
-In the registration section, specifically in `RegisterScreen`, users have to choose their role for the appropirate direction to the screens based on their roles **#SC1**. For me the best way to do this was to use `KivyMD`s `MDDropdownMenu` , which would include two choices of role: Waiter and Administrator. These menu items are generated using `OneLineListItem`:
+This `__str__` method provides a formatted string representation of the item, where it combiness its name, quantity, price, and total cost into a single string. This is used to display item details in the UI and generate summaries for database storage. For example, in the `Table_Waiter` screen, the `update_ordered_items_display` method uses `__str__` to populate the ordered items list: 
 ```.py
-    def create_role_menu(self, input_menu):
-        role_items=[
-            {"text":"Administrator"},
-            {"text":"Waiter"}
-        ]
-        role_list=[]
-        for item in role_items:
-            role_dict={
-                "text":item["text"],
-                "viewclass":"OneLineListItem",
-                "on_release":lambda x=item["text"]:self.button_pressed(x)
-            }
-            role_list.append(role_dict)
-
-        self.role_menu=MDDropdownMenu(
-            caller=input_menu,
-            items=role_list,
-            width_mult=3
-        )
-        self.role_menu.open()
+def update_ordered_items_display(self):  
+    for item in self.order_items:  
+        self.ids.ordered_items_list.add_widget(OneLineListItem(text=str(item)))  
 ```
-Here `caller` binds the menu to dropdown button in kv file and `items` are basically the list of roles. Then to update the text of button and dissmiss the dropdown menu I created `button_pressed` function:
-```.py
-    def button_pressed(self,role):
-        self.ids.dropdown_reg.text=f"{role}"
-        self.role_menu.dismiss()
-```
-But initially, the position of menu was not correct, so I binded the menu to the button using `caller`.
+This where the update to display takes place: first `self.ids.ordered_items_list` represents `id` of `MDList` widget in the Kivy UI, then here `add_widget()` is a Kivy method that adds a child widget to a parent widget, in this case, it is adding a new item to the `MDList` display. And then `OneLineListItem(text=str(item))` creates a new instance of the OneLineListItem class, which is typically from the KivyMD library for a simple list item that displays a single line of text. Then `str(item)` converts the `item` object to a string representation. This means the items in `self.order_items` might be objects of the `OrderedItem` class that I showed above. For this to work properly, the `OrderedItem` class would need to have a `__str__` method to convert objects to strings. In the flow of my application this method is called whenever the ordered items chage, for example when items are added to a ongoing order, to make the UI stay synchronized with the raw data model.
 
-### 4. *Use of Data Table* - **#SC3** 
-To address the **#SC3** I used `KivyMD`'s `MDDataTable` , specially for the part of  **#SC3**, which requires general control over the ongoing orders. So I assigned a new screen and class for this data table: `Ongoing_Orders`. I initialized the components of the table in the `on_pre_enter`, here they are: `Table Number`, `Start Time`, `Order ID`. I also allowed `pagination`, which needed for handling big data,  in case this application will be used for much more busier restaurants in the future. `checkbox`es are the main  factor for controlling the orders by the admin. 
-```.py
-def on_pre_enter(self,*args):
-    column_names=[('Table Number', 100),('Waiter', 100),('Start time', 100),('Order ID', 100)]
-    self.data_table=MDDataTable(
-        size_hint=(.8,.5),
-        pos_hint={'center_x': .5, 'top': .8},
-        use_pagination=True,
-        check=True,
-        column_data=column_names,
-        rows_num=6
-    )
-```
-Here using this data table, administrators can select orders using checkboxes and by the help of `cancel_selected_orders` and `finish_selected_orders` functions, they can update the status of table, which makes automated changes in the database. This implementation of `MDDataTable` helped me to efficiently fulfill the requirements of **#SC3**.  
-
-### 5. *Use of Properties instead of regular variables* - **#SC2, #SC3, #SC5**
+### 3. *Use of Properties instead of regular variables* - **#SC2, #SC3, #SC5**
 I used `Kivy`'s `Properties` (for example `StringProperty`, `ListProperty`, `ObjectProperty` and etc) in especially table screens where I mostly need to deal with the components of the ui for fully functionality. For example:
 ```.py
 class Table_Waiter(MDScreen):
@@ -277,53 +233,15 @@ class Table_Waiter(MDScreen):
 ```
 I came up with this technique after research in web kivy documentation [^10]. They are the most efficient way to work with ui back end logic, and they eliminate the need for manual UI refresh all the time, which is very important factor for screens like `Table_Waiter` as they need more maintainable variables.   
 
-### 6. *Use of MD Dialog* - **#SC2** 170 words
-In the `Table_Waiter` screen, there had to be the section for waiters to add the quantity of the item they selected. For this section I had to make sure that waiter's attention will be focused on the entering quantity for minimizing the distractions and the section had to be reusable for every item in the menu for better optimization. After research on kivy documentation[^11], I decided I have to use `KivyMD`'s `MDDialog` and `QuantityDialog` layout. For implementing it in the `Table_Waiter` class I created `show_quantity_dialog`. This dialog requires waiters to input the needed quantity of food that is also displayed on the dialog.
-```.py
-def show_quantity_dialog(self,food_name,food_price):
-    if not self.quantity_dialog:
-        content=QuantityDialog(food_name=food_name, food_price=food_price)
-        self.quantity_dialog=MDDialog(
-            title="Enter Quantity",
-            type="custom",
-            content_cls=content,
-            buttons=[
-                MDFlatButton(text="CANCEL", on_release=self.dismiss_dialog),
-                MDFlatButton(text="ORDER", on_release=lambda x: self.process_order(content)),
-            ],
-        )
-```
-First function makes sure dialog exists, if not it creates one with the custom layout `QuantityDialog` and two buttons `CANCEL` and `ORDER`. `CANCEL` button is basically dismisses the dialog, while `ORDER` button initializes the functino called `process_order`:
-```.py
-class QuantityDialog(MDBoxLayout):
-    food_name=StringProperty("")
-    food_price=StringProperty("")
-    def __init__(self,**kwargs):
-        super().__init__(**kwargs)
-        self.ids.quantity_input.text="1"
-    def validate_quantity(self):
-        try:
-            quantity=int(self.ids.quantity_input.text)
-            if quantity<=0:
-                return False,"Quantity must be positive"
-            return True,quantity
-        except ValueError:
-            return False,"Quantity must be a number"
-```
-The class `QuantityDialog` has a `MDTextField` for the inputs of quantity. If the dialog exists, then function is updating the content on it with the newly selected item:
-```.py
-self.quantity_dialog.content_cls.food_name=food_name
-self.quantity_dialog.content_cls.food_price=food_price
-```
 
-### 7. *Threading method, batch update, and fixing pragma modes* - **#SC2** 
-Back then, in the `Table_Waiter` screen, as test user, when I was doing multiple transactions, such as adding a new order, printing the bill, or inputting the quantity in the dialog and etc., I was facing a major challenge where screen was freezing after pressing the button to the relevant transaction and I was getting the error- "database is locked". And when I was deeply looking for the reason, I found out that database operations can be enough time-consuming that can be get locked for other operation, which reduces the user experience. I researched for the solution and found about Threading [^12] method which was the best solution to my problem as it offloads database updates to a thread working in the background and makes the UI stay responsive during updates. I implemented it in `process_order `function in the `Table_Waiter` class, where most of database updates and validations are happening. The most important part of this function is to use `threading` for the function `batch_update_db`:
+### 4. *Threading method, batch update, and fixing pragma modes* - **#SC2** 
+Back then, in the `Table_Waiter` screen, as test user, when I was doing multiple transactions, such as adding a new order, printing the bill, or inputting the quantity in the dialog and etc., I was facing a major challenge where screen was freezing after pressing the button to the relevant transaction and I was getting the error- "database is locked". And when I was deeply looking for the reason, I found out that database operations can be enough time-consuming that can be get locked for other operation, which reduces the user experience. I researched for the solution and found about Threading [^11] method which was the best solution to my problem as it offloads database updates to a thread working in the background and makes the UI stay responsive during updates. I implemented it in `process_order `function in the `Table_Waiter` class, where most of database updates and validations are happening. The most important part of this function is to use `threading` for the function `batch_update_db`:
 ```.py
 threading.Thread(target=self.batch_update_db).start()  
 ```
 `batch_update_db` function updates the items list in `order_items`. By uploading this to a background thread, ui remains responsive and does not get freeze.
 
-### 8. *Customization of Buttons* - **#SC5** 
+### 5. *Customization of Buttons* - **#SC5** 
 To address **#SC5** I had to find the best way to mimic the restaurant's actual map in my pos system. For this I decided to customize the table buttons based on the shape they have in reality: rectangular and circular. To match app with real ones I created the classes `CustomRectButton` and `CustomCircleButton`. They are inheriting from Kivy's `ButtonBehavior` and `Widget` classes to customly draw the tables using Kivy's `canvas` instructions. For example, the CustomCircleButton class draws a circle and tabs using `Ellipse` and `Rectangle` to represent the round table with 4 chairs:
 ```.py
 class CustomCircleButton(ButtonBehavior,Widget):  
@@ -345,8 +263,6 @@ def update_graphics(self,*args):
 
 
 # Criteria D: Functionality
-
-
 
 https://github.com/user-attachments/assets/2e201ba1-7571-4eb8-85ee-5d90ac2e8270
 
