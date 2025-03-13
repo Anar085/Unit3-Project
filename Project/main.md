@@ -186,8 +186,19 @@ Back then, in the `Table_Waiter` screen, as test user, when I was doing multiple
 ```.py
 threading.Thread(target=self.batch_update_db).start()  
 ```
-`batch_update_db` function updates the items list in `order_items`. By uploading this to a background thread, ui remains responsive and does not get freeze.
-
+`batch_update_db` function updates the items list in `order_items`. By uploading this to a background thread, ui remains responsive and does not get freeze. One of the most important aspects of the `batch_update_db` function is its use of the `executemany` method for batch database operations. Instead of executing individual `INSERT` or `UPDATE` statements for each item, `executemany` processes multiple rows in a single database call which reduces the time database needs multiople transactions:
+```.py
+items_to_insert=[(order_id,item.name,item.price,item.quantity) for item in new_items]  # here use of [ ] reduces the number of code lines and is more way faster
+cursor.executemany('''  
+    INSERT INTO order_items (order_id,food_name,price,quantity)  
+    VALUES (?,?,?,?)  
+''',items_to_insert)  
+```
+But initially, I used `PRAGMA` modes like:
+```.py
+journal_mode=WAL # Write-Ahead Logging 
+```
+This was for to enable concurrent database access, which would prevent the `"database is locked"` error. But I did not get the result I wanted that is why I continued with `Threading`.
 ### 4. *Customization of Buttons* - **#SC5** 
 To address **#SC5** I had to find the best way to mimic the restaurant's actual map in my pos system. For this I decided to customize the table buttons based on the shape they have in reality: rectangular and circular. To match app with real ones I created the classes `CustomRectButton` and `CustomCircleButton`. They are inheriting from Kivy's `ButtonBehavior` and `Widget` classes to customly draw the tables using Kivy's `canvas` instructions. For example, the CustomCircleButton class draws a circle and tabs using `Ellipse` and `Rectangle` to represent the round table with 4 chairs:
 ```.py
