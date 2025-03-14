@@ -114,14 +114,23 @@
 | 20      | Testing-Take 4 min video demonstrating the application and its functionalities                                      | To achieve clear and concise explanation of the project, its results, and its implementation                    | 1 hour        | March 9                | D         |
 ## Data storing method
 
-![image](https://github.com/user-attachments/assets/c9c5a570-bb1c-4e8b-b7a0-45902964fd75)
+![image](https://github.com/user-attachments/assets/1d85e0d8-8298-4b36-8a3e-46078cdddebd)
 
-**Fig 8** *This extract is an example how the data is stored -**SQL Database***
-(Inconsistencies in ids are due to ***Canceled*** orders)
+**Fig 8** *This extract shows how **`orders`** table is stored in the database.*
+*(Inconsistencies in ids are due to ***Canceled*** orders)*
 
-![image](https://github.com/user-attachments/assets/69ee158b-fdc3-485a-85fa-9ad500a21b25)
+![image](https://github.com/user-attachments/assets/313a1a44-e0bb-4def-a1eb-1fb0531488ed)
 
-**Fig 9** *This extract is an example how the sensitive data such as passwords of users are stored as a **hash** for improved security*
+**Fig 9** *This extract shows how **`tables`** table is stored in the database.*
+
+![image](https://github.com/user-attachments/assets/a0838e64-b372-4fee-8db4-e1e46d620e3b)
+
+**Fig 10** *This extract shows how **`users`** table is stored in the database. This extract is an example how the sensitive data such as passwords of users are stored as a **hash** for improved security*
+![image](https://github.com/user-attachments/assets/7a4039f1-d1de-439b-99b1-f0f9c24f783b)
+
+**Fig 11** *This extract shows how **`order_items`** table is stored in the database.*
+*(Inconsistencies in ids are due to ***Canceled*** orders)*
+
 
 # Criteria C: Development
 
