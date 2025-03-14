@@ -62,7 +62,7 @@
 **Fig 3** *UML Diagram of the classes*
 
 ## ER diagram
-![ER_diagram'](https://github.com/user-attachments/assets/cdc9052d-ff27-43ae-a7e9-fc00b042e05a)
+![ER_diagram_1](https://github.com/user-attachments/assets/3f73557a-0f26-48e7-a815-86c3a701cc53)
 
 **Fig 4** *ER Diagram of the database*
 
