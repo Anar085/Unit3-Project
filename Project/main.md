@@ -66,17 +66,38 @@
 
 **Fig 4** *ER Diagram of the database*
 
+## Data storing method
+
+![image](https://github.com/user-attachments/assets/1d85e0d8-8298-4b36-8a3e-46078cdddebd)
+
+**Fig 5** *This extract shows how **`orders`** table is stored in the database.*
+*(Inconsistencies in ids are due to ***Canceled*** orders)*
+
+![image](https://github.com/user-attachments/assets/313a1a44-e0bb-4def-a1eb-1fb0531488ed)
+
+**Fig 6** *This extract shows how **`tables`** table is stored in the database.*
+
+![image](https://github.com/user-attachments/assets/a0838e64-b372-4fee-8db4-e1e46d620e3b)
+
+**Fig 7** *This extract shows how **`users`** table is stored in the database. This extract is an example how the sensitive data such as passwords of users are stored as a **hash** for improved security*
+![image](https://github.com/user-attachments/assets/7a4039f1-d1de-439b-99b1-f0f9c24f783b)
+
+**Fig 8** *This extract shows how **`order_items`** table is stored in the database.*
+*(Inconsistencies in ids are due to ***Canceled*** orders)*
+
+
+
 ## Flow diagrams for algorithms
 ![flow1](https://github.com/user-attachments/assets/6299626b-271f-4c92-b38a-57d05c7865ab)
 
-**Fig 5** *This flowchart represents the login process from **`LoginScreen`** class. (Easy)*
+**Fig 9** *This flowchart represents the login process from **`LoginScreen`** class. (Easy)*
 ![flow2](https://github.com/user-attachments/assets/ffff4b0e-df87-4bc2-8472-fae75a4214d8)
 
-**Fig 6** *This flowchart represents the batch update process from the **`Table_Waiter`** class, where multiple items are updated in the database. (Medium)*
+**Fig 10** *This flowchart represents the batch update process from the **`Table_Waiter`** class, where multiple items are updated in the database. (Medium)*
 
 ![flow3r](https://github.com/user-attachments/assets/6bb26b1d-c313-41d8-8e50-67d5e415358d)
 
-**Fig 7** *This flowchart represents the entire lifecycle of an order, from creation to completion or cancellation. (Hard)*
+**Fig 11** *This flowchart represents the entire lifecycle of an order, from creation to completion or cancellation. (Hard)*
 
 
 
@@ -112,25 +133,6 @@
 | 18      | Development-Follow the task no 16 and no 17 for also Admin Occupied class and screen                                | Get a screen where admin can finish/cancel order of the table touched                                           | 2 hours       | March 7                | C         |
 | 19      | Development-Create a data table for Ongoing Orders that can be only accessed by admins                              | Make tracking ongoing orders easier for admins                                                                  | 2 hours       | March 8                | C         |
 | 20      | Testing-Take 4 min video demonstrating the application and its functionalities                                      | To achieve clear and concise explanation of the project, its results, and its implementation                    | 1 hour        | March 9                | D         |
-## Data storing method
-
-![image](https://github.com/user-attachments/assets/1d85e0d8-8298-4b36-8a3e-46078cdddebd)
-
-**Fig 8** *This extract shows how **`orders`** table is stored in the database.*
-*(Inconsistencies in ids are due to ***Canceled*** orders)*
-
-![image](https://github.com/user-attachments/assets/313a1a44-e0bb-4def-a1eb-1fb0531488ed)
-
-**Fig 9** *This extract shows how **`tables`** table is stored in the database.*
-
-![image](https://github.com/user-attachments/assets/a0838e64-b372-4fee-8db4-e1e46d620e3b)
-
-**Fig 10** *This extract shows how **`users`** table is stored in the database. This extract is an example how the sensitive data such as passwords of users are stored as a **hash** for improved security*
-![image](https://github.com/user-attachments/assets/7a4039f1-d1de-439b-99b1-f0f9c24f783b)
-
-**Fig 11** *This extract shows how **`order_items`** table is stored in the database.*
-*(Inconsistencies in ids are due to ***Canceled*** orders)*
-
 
 # Criteria C: Development
 
