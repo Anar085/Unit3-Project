@@ -230,7 +230,10 @@ def update_graphics(self,*args):
 
 # Criteria D: Functionality
 
-https://github.com/user-attachments/assets/2e201ba1-7571-4eb8-85ee-5d90ac2e8270
+
+
+https://github.com/user-attachments/assets/49fbe202-464e-4e8d-bd99-ed7d859983cc
+
 
 
 
