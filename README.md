@@ -1,4 +1,4 @@
-# Unit 3: Point of Sale (POS) application for Turkish Restaurant
+# Project 3: Point of Sale (POS) application for Turkish Restaurant
 
 ## Criteria A: Planning
 
